@@ -1,0 +1,59 @@
+import React from "react";
+import Image from "next/image";
+
+const Pengembang = () => {
+  return (
+    <div className="min-h-screen flex items-center text-black flex-col py-20">
+      <p className="mb-10 text-3xl font-bold">Team Pengembang Project</p>
+      <div className="flex flex-row space-x-10">
+        <div className="avatar flex flex-col items-center p-4">
+          <div className="w-36 rounded-full">
+            <Image src="/aria.jpeg" width={80} height={80} alt="aria" />
+          </div>
+          <p className="mt-4 font-bold text-xl">Raditya Aria Ramadhani</p>
+        </div>
+        <div className="avatar flex flex-col items-center p-4">
+          <div className="w-36 rounded-full">
+            <Image src="/albertus.jpg" width={80} height={80} alt="albertus" />
+          </div>
+          <p className="mt-4 font-bold text-xl">Albertus Lie</p>
+        </div>
+        <div className="avatar flex flex-col items-center p-4">
+          <div className="w-36 rounded-full">
+            <Image src="/yumarlin.jpeg" width={80} height={80} alt="yumarlin" />
+          </div>
+          <p className="mt-4 font-bold text-xl">
+            Yumarlin MZ, S.Kom., M.Pd., M.Kom.
+          </p>
+        </div>
+        <div className="avatar flex flex-col items-center p-4">
+          <div className="w-36 rounded-full">
+            <Image src="/heri.jpeg" width={80} height={80} alt="heri" />
+          </div>
+          <p className="mt-4 font-bold text-xl">Heri Agus Supriyanto</p>
+        </div>
+      </div>
+      <p className="bg-slate-200 px-10 py-8 mt-4 text-xl">
+        Website ini merupakan hasil pengembangan dari sebuah proyek AI yang
+        dirancang untuk mendukung proses penerimaan pupuk secara cerdas dan
+        efisien. Proyek ini dikerjakan oleh mahasiswa Universitas Janabadra,
+        <span className="font-bold">Raditya Aria Ramadhani, Heri Agus Supriyanto, dan Albertus Lie</span>, sebagai
+        bagian dari tugas akhir dalam rangka proyek tugas akhir mata kuliah
+        Kecerdasan Buatan. Pengembangan proyek ini dilakukan di bawah bimbingan
+        dosen pembimbing kami, <span className="font-bold">Yumarlin MZ, S.Kom., M.Pd., M.Kom.</span>, yang telah
+        memberikan arahan, masukan, serta dukungan penuh selama seluruh proses
+        berlangsung. Tujuan utama dari website ini adalah untuk menyediakan
+        platform modern berbasis kecerdasan buatan yang mampu membantu pengguna
+        dalam melakukan analisis data dan pengambilan keputusan terkait
+        penerimaan pupuk. Dengan mengintegrasikan teknologi AI dan desain yang
+        responsif, kami berharap platform ini dapat memberikan solusi praktis
+        dan pengalaman terbaik bagi para penggunanya. Kami mengucapkan terima
+        kasih atas semua dukungan yang telah diberikan oleh Universitas
+        Janabadra, dosen pembimbing, serta semua pihak yang telah berkontribusi
+        dalam pengembangan proyek ini.
+      </p>
+    </div>
+  );
+};
+
+export default Pengembang;

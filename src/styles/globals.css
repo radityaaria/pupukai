@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Menambahkan warna latar belakang putih */
+body {
+  background-color: white;
+  color: black;
+}
