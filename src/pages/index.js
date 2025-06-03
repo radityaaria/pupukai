@@ -15,91 +15,84 @@ const geistMono = localFont({
 export default function Home() {
   return (
     <div className={`${geistSans.variable} min-h-screen`}>
-      <p>KONTOLODON</p>
-      {/* <header
+      <header
         className="text-white text-center py-20"
         style={{
-          backgroundImage: "url('/halaman.png')",
+          backgroundImage: "url('/pupuk.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <h1 className="text-4xl font-bold">
-          Selamat Datang di Toko Mebel Mbah Kayyun
-        </h1>
+        <h1 className="text-4xl font-bold">SELAMAT DATANG DI PUPUK AI</h1>
         <p className="mt-4 text-lg">
-          Temukan furnitur terbaik untuk rumah Anda
+        Keputusan terbaik untuk penyaluran bantuan pupuk.
         </p>
       </header>
-      <div className="mt-10 p-8 bg-gray-100 rounded-lg px-12">
+      <div className="mt-1 p-8 bg-gray-100 rounded-lg px-12">
         <p>
-          <span className="ml-6 ">
-            Yogyakarta telah menjadi pusat industri mebel yang terus berkembang,
-          </span>
-          menarik perhatian pasar lokal dan internasional. Permintaan akan
-          furnitur berkualitas tinggi semakin meningkat, seiring dengan reputasi
-          Yogyakarta sebagai pusat kerajinan kayu. Para pengrajin lokal di Jogja
-          tidak hanya menghasilkan produk mebel yang fungsional, tetapi juga
-          menghadirkan sentuhan estetika yang memukau. Dengan perpaduan desain
-          tradisional yang kaya budaya dan elemen modern yang inovatif,
-          produk-produk mebel dari Jogja mampu memenuhi kebutuhan beragam
-          konsumen dan menjadi daya tarik tersendiri di pasar global.
+          <span className="ml-8">Yogyakarta</span> dikenal sebagai salah satu wilayah pertanian yang aktif dan
+          memiliki berbagai program bantuan untuk mendukung kesejahteraan
+          petani. Namun, proses penentuan kelayakan penerima bantuan sering kali
+          menghadapi tantangan seperti keterbatasan data, potensi subjektivitas,
+          dan kurangnya transparansi. Untuk menjawab tantangan tersebut,
+          dikembangkanlah sebuah sistem berbasis kecerdasan buatan yang mampu
+          melakukan analisis kelayakan secara objektif dan efisien.
         </p>
+        <br />
         <p>
-          <span className="ml-6">
-            Kami menerapkan sistem pembuatan berdasarkan pesanan (made-to-order)
-          </span>
-          untuk memastikan setiap produk memenuhi kebutuhan dan preferensi
-          pelanggan. Namun, kami juga menyediakan beberapa produk yang siap
-          pakai untuk pelanggan yang membutuhkan furnitur dengan segera. Dengan
-          pendekatan ini, kami dapat menjaga kualitas produk dan memberikan
-          layanan yang lebih baik kepada pelanggan kami.
+          <span className="ml-8">Sistem ini</span> menggunakan pendekatan data-driven dengan metode K-Nearest
+          Neighbor (KNN) untuk menilai setiap calon penerima berdasarkan
+          kriteria tertentu yang telah ditetapkan. Dengan sistem ini, proses
+          seleksi tidak hanya menjadi lebih cepat dan akurat, tetapi juga lebih
+          adil. Pendekatan ini diharapkan mampu meningkatkan kualitas pelayanan
+          dalam penyaluran bantuan dan memperkuat kepercayaan masyarakat
+          terhadap program subsidi pertanian.
         </p>
       </div>
       <main className="p-8">
-        <h2 className="text-2xl font-semibold mb-4">Produk Unggulan</h2>
+        <h2 className="text-2xl font-semibold mb-4">Serah Terima Bantuan Pupuk Organik</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="border rounded-lg p-4">
             <div className="relative w-full pb-[100%]">
               <Image
-                src="/pintu.jpeg"
+                src="/polres1.jpeg"
                 alt="Produk 1"
                 layout="fill"
                 objectFit="cover"
                 className="rounded"
               />
             </div>
-            <h3 className="font-bold mt-2">Pintu</h3>
-            <p className="text-gray-700">Rp 1.200.000</p>
+            <h3 className="font-bold mt-2">KWT Puspa Gemari Kedaton</h3>
+            <p className="text-gray-700">Pleret</p>
           </div>
           <div className="border rounded-lg p-4">
             <div className="relative w-full pb-[100%]">
               <Image
-                src="/jendela.jpeg"
+                src="/polres2.jpeg"
                 alt="Produk 2"
                 layout="fill"
                 objectFit="cover"
                 className="rounded"
               />
             </div>
-            <h3 className="font-bold mt-2">Jendela</h3>
-            <p className="text-gray-700">Rp 500.000</p>
+            <h3 className="font-bold mt-2">KWT Guyub Rukun Gadingharjo</h3>
+            <p className="text-gray-700">Sanden</p>
           </div>
           <div className="border rounded-lg p-4">
             <div className="relative w-full pb-[100%]">
               <Image
-                src="/kusen.jpeg"
+                src="/polres3.jpeg"
                 alt="Produk 3"
                 layout="fill"
                 objectFit="cover"
                 className="rounded"
               />
             </div>
-            <h3 className="font-bold mt-2">Kusen</h3>
-            <p className="text-gray-700">Rp 800.000</p>
+            <h3 className="font-bold mt-2">KWT Sari Dewi II Gubug Argosari</h3>
+            <p className="text-gray-700">Sedayu</p>
           </div>
         </div>
-      </main> */}
+      </main>
     </div>
   );
 }

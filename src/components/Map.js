@@ -25,7 +25,7 @@ const MapComponent = () => {
           }),
         ],
         view: new View({
-          center: fromLonLat([110.3042181, -7.7781158]),
+          center: fromLonLat([110.32691785175305, -7.889943173919646]),
           zoom: 17,
         }),
       });
@@ -36,7 +36,7 @@ const MapComponent = () => {
       mapInstance.current.addLayer(markerLayer.current);
 
       const marker = new Feature({
-        geometry: new Point(fromLonLat([110.3042181, -7.7781158])),
+        geometry: new Point(fromLonLat([110.32691785175305, -7.889943173919646])),
       });
 
       marker.setStyle(

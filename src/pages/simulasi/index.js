@@ -1,208 +1,162 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+'use client';
 
-const Simulasi = () => {
-  const [kayu, setKayu] = useState("");
-  const [paku, setPaku] = useState("");
-  const [lem, setLem] = useState("");
-  const [hasil, setHasil] = useState(null);
-  const router = useRouter();
+import { useState } from 'react';
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/register");
-    }
-  }, [router]);
+const bobotKriteria = {
+  luas_lahan: 5,
+  anggota_tani: 2,
+  hasil_panen: 3,
+  pemanfaatan: 4,
+  status_lahan: 3,
+  pendapatan: 3,
+  rekomendasi: 2
+};
 
-  const gaussJordan = (matrix) => {
-    const n = matrix.length;
+const dataset = [
+  {
+    luas_lahan: 3,
+    anggota_tani: 2,
+    hasil_panen: 3,
+    pemanfaatan: 3,
+    status_lahan: 3,
+    pendapatan: 3,
+    rekomendasi: 2,
+    kelas: "Layak"
+  },
+  {
+    luas_lahan: 1,
+    anggota_tani: 1,
+    hasil_panen: 1,
+    pemanfaatan: 3,
+    status_lahan: 2,
+    pendapatan: 1,
+    rekomendasi: 1,
+    kelas: "Tidak Layak"
+  },
+  {
+    luas_lahan: 3,
+    anggota_tani: 1,
+    hasil_panen: 3,
+    pemanfaatan: 1,
+    status_lahan: 1,
+    pendapatan: 1,
+    rekomendasi: 1,
+    kelas: "Tidak Layak"
+  },
+  {
+    luas_lahan: 3,
+    anggota_tani: 2,
+    hasil_panen: 2,
+    pemanfaatan: 2,
+    status_lahan: 2,
+    pendapatan: 2,
+    rekomendasi: 2,
+    kelas: "Layak"
+  },
+  {
+    luas_lahan: 2,
+    anggota_tani: 2,
+    hasil_panen: 3,
+    pemanfaatan: 2,
+    status_lahan: 1,
+    pendapatan: 2,
+    rekomendasi: 2,
+    kelas: "Tidak Layak"
+  }
+];
 
-    for (let i = 0; i < n; i++) {
-      let maxEl = Math.abs(matrix[i][i]);
-      let maxRow = i;
-      for (let k = i + 1; k < n; k++) {
-        if (Math.abs(matrix[k][i]) > maxEl) {
-          maxEl = Math.abs(matrix[k][i]);
-          maxRow = k;
-        }
-      }
+function hitungJarak(data1, data2) {
+  let jarak = 0;
+  for (let kriteria in bobotKriteria) {
+    const selisih = data1[kriteria] - data2[kriteria];
+    jarak += Math.pow(selisih, 2) * bobotKriteria[kriteria];
+  }
+  return Math.sqrt(jarak);
+}
 
-      for (let k = i; k < n + 1; k++) {
-        let tmp = matrix[maxRow][k];
-        matrix[maxRow][k] = matrix[i][k];
-        matrix[i][k] = tmp;
-      }
-
-      let pivot = matrix[i][i];
-      if (pivot === 0) {
-        throw new Error("Tidak ada solusi unik.");
-      }
-      for (let k = i; k < n + 1; k++) {
-        matrix[i][k] /= pivot;
-      }
-
-      for (let j = 0; j < n; j++) {
-        if (j !== i) {
-          let factor = matrix[j][i];
-          for (let k = i; k < n + 1; k++) {
-            matrix[j][k] -= factor * matrix[i][k];
-          }
-        }
-      }
-    }
-
-    const solution = [];
-    for (let i = 0; i < n; i++) {
-      solution.push(matrix[i][n]);
-    }
-    return solution;
+function prediksiKNN(inputData, k = 3) {
+  const jarakSemua = dataset.map(data => {
+    return { jarak: hitungJarak(inputData, data), kelas: data.kelas };
+  });
+  jarakSemua.sort((a, b) => a.jarak - b.jarak);
+  const tetangga = jarakSemua.slice(0, k);
+  const count = {};
+  tetangga.forEach(t => {
+    count[t.kelas] = (count[t.kelas] || 0) + 1;
+  });
+  return {
+    hasil: Object.entries(count).sort((a, b) => b[1] - a[1])[0][0],
+    detail: tetangga
   };
+}
 
-  const hitungProduk = (totalKayu, totalPaku, totalLem) => {
-    const matrix = [
-      [2, 1, 1, totalKayu],
-      [30, 20, 15, totalPaku],
-      [3, 2, 1, totalLem],
-    ];
+export default function PrediksiPupuk() {
+  const [formData, setFormData] = useState({
+    luas_lahan: '1',
+    anggota_tani: '1',
+    hasil_panen: '1',
+    pemanfaatan: '1',
+    status_lahan: '1',
+    pendapatan: '1',
+    rekomendasi: '1'
+  });
+  const [hasilPrediksi, setHasilPrediksi] = useState(null);
 
-    const [x, y, z] = gaussJordan(matrix);
-    return {
-      pintu: Math.round(x),
-      jendela: Math.round(y),
-      kusen: Math.round(z),
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const totalKayu = parseFloat(kayu);
-    const totalPaku = parseFloat(paku);
-    const totalLem = parseFloat(lem);
-
-    if (isNaN(totalKayu) || isNaN(totalPaku) || isNaN(totalLem)) {
-      setHasil({
-        error: "Semua input harus berupa angka yang valid.",
-      });
-      return;
-    }
-
-    try {
-      const hasilPerhitungan = hitungProduk(totalKayu, totalPaku, totalLem);
-      setHasil({
-        pintu: hasilPerhitungan.pintu,
-        jendela: hasilPerhitungan.jendela,
-        kusen: hasilPerhitungan.kusen,
-        totalKayu,
-        totalPaku,
-        totalLem,
-      });
-    } catch (error) {
-      setHasil({
-        error: error.message,
-      });
-    }
+    const input = Object.fromEntries(Object.entries(formData).map(([k, v]) => [k, parseInt(v)]));
+    const { hasil, detail } = prediksiKNN(input);
+    setHasilPrediksi({ hasil, detail });
   };
 
   return (
-    <div className="min-h-screen p-10 flex items-center justify-center">
-      <div className="w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Simulasi Perhitungan Produk
-        </h1>
-        <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="kayu" className="block mb-1 font-semibold">
-                Kayu (meter)
-              </label>
-              <input
-                id="kayu"
-                type="number"
-                value={kayu}
-                onChange={(e) => setKayu(e.target.value)}
-                required
-                placeholder="Masukkan jumlah kayu"
-                className="w-full p-2 border border-gray-300 rounded bg-white"
-                min="0"
-                step="any"
-              />
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-4 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-3xl">
+        <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">Prediksi Kelayakan Bantuan Pupuk</h1>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            { name: 'luas_lahan', label: 'Luas Lahan', options: ['< 0.5 hektar', '0.5 - 1 hektar', '> 1 hektar'] },
+            { name: 'anggota_tani', label: 'Jumlah Anggota Tani', options: ['< 10', '10 - 20', '> 20'] },
+            { name: 'hasil_panen', label: 'Produksi Panen', options: ['< 1 ton', '1 - 2 ton', '> 2 ton'] },
+            { name: 'pemanfaatan', label: 'Pemanfaatan Bantuan', options: ['Pernah (tidak tepat guna)', 'Pernah (tepat guna)', 'Tidak pernah'] },
+            { name: 'status_lahan', label: 'Status Lahan', options: ['Milik sendiri', 'Sewa', 'Bagi hasil'] },
+            { name: 'pendapatan', label: 'Pendapatan Musim', options: ['> 5 juta', '2 - 5 juta', '< 2 juta'] },
+            { name: 'rekomendasi', label: 'Rekomendasi Penyuluh', options: ['Tidak direkomendasikan', 'Direkomendasikan'] },
+          ].map(({ name, label, options }) => (
+            <div key={name} className="flex flex-col">
+              <label htmlFor={name} className="text-sm font-semibold text-gray-700 mb-1">{label}</label>
+              <select
+                name={name}
+                id={name}
+                value={formData[name]}
+                onChange={handleChange}
+                className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+              >
+                {options.map((opt, idx) => (
+                  <option key={idx} value={idx + 1}>{opt}</option>
+                ))}
+              </select>
             </div>
-            <div>
-              <label htmlFor="paku" className="block mb-1 font-semibold">
-                Paku (pcs)
-              </label>
-              <input
-                id="paku"
-                type="number"
-                value={paku}
-                onChange={(e) => setPaku(e.target.value)}
-                required
-                placeholder="Masukkan jumlah paku"
-                className="w-full p-2 border border-gray-300 rounded bg-white"
-                min="0"
-                step="any"
-              />
-            </div>
-            <div>
-              <label htmlFor="lem" className="block mb-1 font-semibold">
-                Lem (botol)
-              </label>
-              <input
-                id="lem"
-                type="number"
-                value={lem}
-                onChange={(e) => setLem(e.target.value)}
-                required
-                placeholder="Masukkan jumlah lem"
-                className="w-full p-2 border border-gray-300 rounded bg-white"
-                min="0"
-                step="any"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 rounded"
-            >
-              Hitung
-            </button>
-          </form>
+          ))}
+          <button
+            type="submit"
+            className="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg mt-4"
+          >
+            Prediksi Sekarang
+          </button>
+        </form>
 
-          {/* Menampilkan hasil */}
-          {hasil && (
-            <div className="mt-6 p-4 bg-white rounded shadow">
-              {hasil.error ? (
-                <p className="text-red-500">{hasil.error}</p>
-              ) : (
-                <div>
-                  <p className="mt-4 font-semibold text-xl">
-                    Input Bahan Baku:
-                  </p>
-                  <p>Kayu: {hasil.totalKayu} meter</p>
-                  <p>Paku: {hasil.totalPaku} pcs</p>
-                  <p>Lem: {hasil.totalLem} botol</p>
-                  <p className="text-xl font-semibold mt-4">
-                    Hasil Perhitungan:
-                  </p>
-                  <p>Pintu: {hasil.pintu}</p>
-                  <p>Jendela: {hasil.jendela}</p>
-                  <p>Kusen: {hasil.kusen}</p>
-
-                  {hasil.pintu < 0 || hasil.jendela < 0 || hasil.kusen < 0 ? (
-                    <p className="text-red-500 mt-2">
-                      *Hasil negatif menunjukkan ada jumlah bahan baku yang
-                      kurang.
-                    </p>
-                  ) : null}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        {hasilPrediksi && (
+          <div className={`mt-6 text-center p-4 rounded-lg font-semibold ${hasilPrediksi.hasil === 'Layak' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            Hasil Prediksi: {hasilPrediksi.hasil}
+          </div>
+        )}
       </div>
-    </div>
+    </main>
   );
-};
-
-export default Simulasi;
+}

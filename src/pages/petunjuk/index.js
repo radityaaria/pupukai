@@ -8,38 +8,29 @@ const Petunjuk = () => {
           Petunjuk Penggunaan Website
         </h1>
         <div className="space-y-4 text-lg">
-          <h2 className="text-2xl font-semibold">1. Menjelajahi Produk</h2>
+          <h2 className="text-2xl font-semibold">1. Menjelajahi Fitur Sistem</h2>
           <p>
-            Anda dapat menjelajahi berbagai produk yang kami tawarkan di halaman
-            utama. Klik pada gambar produk untuk melihat detail lebih lanjut.
+            Anda dapat menjelajahi berbagai fitur sistem di halaman utama, termasuk informasi mengenai proses seleksi bantuan dan teknologi yang digunakan. Klik pada menu yang tersedia untuk melihat detail lebih lanjut.
           </p>
 
-          <h2 className="text-2xl font-semibold">2. Melihat Lokasi Toko</h2>
+          <h2 className="text-2xl font-semibold">2. Melihat Informasi Sistem</h2>
           <p>
-            Untuk mengetahui lokasi kami, silakan kunjungi halaman "About" dan
-            lihat peta yang tersedia. Anda dapat menggunakan peta untuk
-            mendapatkan petunjuk arah.
+            Untuk memahami latar belakang dan tujuan dari sistem ini, silakan kunjungi halaman "Tentang Kami". Di sana terdapat penjelasan mengenai metode KNN dan manfaat sistem bagi penyaluran bantuan pertanian.
           </p>
 
-          <h2 className="text-2xl font-semibold">3. Melakukan Pemesanan</h2>
+          <h2 className="text-2xl font-semibold">3. Login / Registrasi</h2>
           <p>
-            Jika Anda tertarik dengan produk tertentu, silakan hubungi kami
-            melalui informasi kontak yang tersedia di halaman "Kontak Kami".
-            Kami akan membantu Anda dalam proses pemesanan.
+            Jika Anda ingin menggunakan sistem untuk mensimulasikan kelayakan penerimaan bantuan pupuk, silakan login atau mendaftar terlebih dahulu untuk mendapatkan akses ke halaman simulasi.
           </p>
 
-          <h2 className="text-2xl font-semibold">4. Login / Register</h2>
+          <h2 className="text-2xl font-semibold">4. Simulasi Kelayakan</h2>
           <p>
-            Jika anda ingin mensimulasikan berapa banyak produk yang dapat
-            dihasilkan dari banyaknya stock bahan silahkan login / mendaftar
-            untuk bisa mengakses halaman simulasi.
+            Setelah berhasil login, buka halaman Simulasi Kelayakan. Inputkan data sesuai formulir yang tersedia, seperti luas lahan, Jumlah anggota tani, Produksi hasil panen, pemanfaatan bantuan sebelumnya, status lahan,pendapatan rata-rata permusim,dan rekomendasi dari penyuluh. Sistem akan menganalisis dan menampilkan hasil kelayakan berdasarkan data yang Anda masukkan.
           </p>
 
-          <h2 className="text-2xl font-semibold">5. Simulasi Hitung</h2>
+          <h2 className="text-2xl font-semibold">5. Hubungi Kami</h2>
           <p>
-            Setelah berhasil login silahkan pergi menuju halaman Simulasi Hitung
-            dan inputkan jumlah bahan untuk mengetahui berapa banyak produk yang
-            dapat dihasilkan.
+            Jika Anda mengalami kendala atau memiliki pertanyaan lebih lanjut, silakan hubungi tim kami melalui informasi kontak yang tersedia di halaman "Kontak". Kami siap membantu Anda.
           </p>
         </div>
       </div>

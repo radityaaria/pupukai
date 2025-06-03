@@ -4,33 +4,37 @@ import Image from "next/image";
 const Pengembang = () => {
   return (
     <div className="min-h-screen flex items-center text-black flex-col py-20">
-      <p className="mb-10 text-3xl font-bold">Team Pengembang Project</p>
-      <div className="flex flex-row space-x-10">
-        <div className="avatar flex flex-col items-center p-4">
-          <div className="w-36 rounded-full">
-            <Image src="/aria.jpeg" width={80} height={80} alt="aria" />
+      <p className="mb-1 text-3xl font-bold">Team Pengembang Project</p>
+      <div className="flex flex-col items-center">
+        <div className="flex flex-row justify-center">
+          <div className="avatar flex flex-col items-center p-4">
+            <div className="w-36 rounded-full">
+              <Image src="/yumarlin.jpeg" width={80} height={80} alt="yumarlin" />
+            </div>
+            <p className="mt-1 font-bold text-xl text-center">
+              Yumarlin MZ, S.Kom., M.Pd., M.Kom.
+            </p>
           </div>
-          <p className="mt-4 font-bold text-xl">Raditya Aria Ramadhani</p>
         </div>
-        <div className="avatar flex flex-col items-center p-4">
-          <div className="w-36 rounded-full">
-            <Image src="/albertus.jpg" width={80} height={80} alt="albertus" />
+        <div className="flex flex-row justify-center space-x-4 mt-2">
+          <div className="avatar flex flex-col items-center p-4">
+            <div className="w-36 rounded-full">
+              <Image src="/aria.jpeg" width={80} height={80} alt="aria" />
+            </div>
+            <p className="mt-4 font-bold text-xl text-center">Raditya Aria Ramadhani</p>
           </div>
-          <p className="mt-4 font-bold text-xl">Albertus Lie</p>
-        </div>
-        <div className="avatar flex flex-col items-center p-4">
-          <div className="w-36 rounded-full">
-            <Image src="/yumarlin.jpeg" width={80} height={80} alt="yumarlin" />
+          <div className="avatar flex flex-col items-center p-4">
+            <div className="w-36 rounded-full">
+              <Image src="/albertus.jpg" width={80} height={80} alt="albertus" />
+            </div>
+            <p className="mt-4 font-bold text-xl text-center">Albertus Lie</p>
           </div>
-          <p className="mt-4 font-bold text-xl">
-            Yumarlin MZ, S.Kom., M.Pd., M.Kom.
-          </p>
-        </div>
-        <div className="avatar flex flex-col items-center p-4">
-          <div className="w-36 rounded-full">
-            <Image src="/heri.jpeg" width={80} height={80} alt="heri" />
+          <div className="avatar flex flex-col items-center p-4">
+            <div className="w-36 rounded-full">
+              <Image src="/heri.jpeg" width={80} height={80} alt="heri" />
+            </div>
+            <p className="mt-4 font-bold text-xl text-center">Heri Agus Supriyanto</p>
           </div>
-          <p className="mt-4 font-bold text-xl">Heri Agus Supriyanto</p>
         </div>
       </div>
       <p className="bg-slate-200 px-10 py-8 mt-4 text-xl">
