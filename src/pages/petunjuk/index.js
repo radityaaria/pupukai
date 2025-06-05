@@ -2,8 +2,8 @@ import React from "react";
 
 const Petunjuk = () => {
   return (
-    <div className="min-h-screen p-6">
-      <div className="bg-slate-200 p-8">
+    <div className="min-h-screen bg-slate-200 p-6">
+      <div className="bg-slate-300 p-8">
         <h1 className="text-3xl font-bold text-center mb-6">
           Petunjuk Penggunaan Website
         </h1>

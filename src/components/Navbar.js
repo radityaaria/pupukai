@@ -26,25 +26,19 @@ const Navbar = () => {
             Petunjuk Penggunaan
           </a>
         </li>
-        {/* <li>
+        <li>
           <a href="/simulasi" className="hover:text-gray-400">
-            Simulasi Hitung
+            Simulasi Kelayakan Bantuan
           </a>
-        </li> */}
+        </li>
       </ul>
-      <details className="dropdown dropdown-end">
-        <summary className="btn m-1 bg-white text-black hover:bg-slate-200">
-        <IoIosLogIn className="h-8 w-8 font-bold"/>
-        </summary>
-        <ul className="menu dropdown-content bg-white text-black font-semibold rounded-box z-[1] w-36 p-2 shadow">
-          <li>
-            <a href="/login">Login</a>
-          </li>
-          <li>
-            <a href="/register">Register</a>
-          </li>
-        </ul>
-      </details>
+      <a
+        href="/login"
+        className="flex items-center gap-2 bg-white text-black px-3 py-2 rounded hover:bg-slate-200 transition font-semibold"
+        style={{ minWidth: 44 }}
+      >
+        <IoIosLogIn className="h-8 w-8 font-bold" />
+      </a>
     </nav>
   );
 };

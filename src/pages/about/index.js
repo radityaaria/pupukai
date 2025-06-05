@@ -9,7 +9,7 @@ const MapComponent = dynamic(() => import("../../components/Map"), {
 
 const About = () => {
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen bg-slate-200 p-6">
       <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
         <div className="flex-1 space-y-4 text-lg">
           <h1 className="text-3xl font-bold mt-4 text-center md:text-left">

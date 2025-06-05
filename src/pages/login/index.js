@@ -1,29 +1,18 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import client from "../../../libs/axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter(); // Inisialisasi useRouter
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const response = await client.post("/auth/login", {
-        email,
-        password,
-      });
-
-      if (response.status === 200) {
-        localStorage.setItem("token", response.data.token);
-        router.push("/simulasi");
-      } else {
-        alert("Email atau password salah!");
-      }
-    } catch (error) {
-      alert("Terjadi kesalahan saat login!");
+    if (email === "admin@admin.id" && password === "admin123") {
+      localStorage.setItem("token", "static-token");
+      router.push("/dashboard");
+    } else {
+      alert("Email atau password salah!");
     }
   };
 
@@ -36,8 +25,8 @@ const Login = () => {
         onSubmit={handleSubmit}
         className="space-y-4 bg-white shadow-xl rounded-xl p-8 w-full max-w-2xl transform hover:scale-[1.01] transition-transform duration-300"
       >
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Login Form
+        <h1 className="text-2xl font-bold mb-4 text-center">
+          Silahkan Login
         </h1>
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-4">
@@ -64,16 +53,16 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full p-2 border border-gray-300 rounded bg-white"
+                className="w-full p-2 border border-gray-300 mb-2 rounded bg-white"
               />
             </div>
           </div>
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 font-bold"
+          className="w-full mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 font-bold"
         >
-          Login
+          Masuk
         </button>
       </form>
     </div>

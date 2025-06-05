@@ -3,13 +3,13 @@ import Image from "next/image";
 
 const Pengembang = () => {
   return (
-    <div className="min-h-screen flex items-center text-black flex-col py-20">
+    <div className="min-h-screen flex items-center bg-slate-200 text-black flex-col py-20">
       <p className="mb-1 text-3xl font-bold">Team Pengembang Project</p>
       <div className="flex flex-col items-center">
         <div className="flex flex-row justify-center">
-          <div className="avatar flex flex-col items-center p-4">
-            <div className="w-36 rounded-full">
-              <Image src="/yumarlin.jpeg" width={80} height={80} alt="yumarlin" />
+          <div className="flex flex-col items-center p-4">
+            <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-slate-300 shadow">
+              <Image src="/yumarlin.jpeg" width={144} height={144} alt="yumarlin" />
             </div>
             <p className="mt-1 font-bold text-xl text-center">
               Yumarlin MZ, S.Kom., M.Pd., M.Kom.
@@ -17,27 +17,27 @@ const Pengembang = () => {
           </div>
         </div>
         <div className="flex flex-row justify-center space-x-4 mt-2">
-          <div className="avatar flex flex-col items-center p-4">
-            <div className="w-36 rounded-full">
-              <Image src="/aria.jpeg" width={80} height={80} alt="aria" />
+          <div className="flex flex-col items-center p-4">
+            <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-slate-300 shadow">
+              <Image src="/aria.jpeg" width={144} height={144} alt="aria" />
             </div>
             <p className="mt-4 font-bold text-xl text-center">Raditya Aria Ramadhani</p>
           </div>
-          <div className="avatar flex flex-col items-center p-4">
-            <div className="w-36 rounded-full">
-              <Image src="/albertus.jpg" width={80} height={80} alt="albertus" />
+          <div className="flex flex-col items-center p-4">
+            <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-slate-300 shadow">
+              <Image src="/albertus.jpg" width={144} height={144} alt="albertus" />
             </div>
             <p className="mt-4 font-bold text-xl text-center">Albertus Lie</p>
           </div>
-          <div className="avatar flex flex-col items-center p-4">
-            <div className="w-36 rounded-full">
-              <Image src="/heri.jpeg" width={80} height={80} alt="heri" />
+          <div className="flex flex-col items-center p-4">
+            <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-slate-300 shadow">
+              <Image src="/heri.jpeg" width={144} height={144} alt="heri" />
             </div>
             <p className="mt-4 font-bold text-xl text-center">Heri Agus Supriyanto</p>
           </div>
         </div>
       </div>
-      <p className="bg-slate-200 px-10 py-8 mt-4 text-xl">
+      <p className="bg-slate-300 px-10 py-8 mt-4 text-xl">
         Website ini merupakan hasil pengembangan dari sebuah proyek AI yang
         dirancang untuk mendukung proses penerimaan pupuk secara cerdas dan
         efisien. Proyek ini dikerjakan oleh mahasiswa Universitas Janabadra,
