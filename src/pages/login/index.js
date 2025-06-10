@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -8,10 +9,18 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email === "admin@admin.id" && password === "admin123") {
-      localStorage.setItem("token", "static-token");
-      router.push("/dashboard");
-    } else {
+    try {
+      const response = await axios.post("https://database-query.paso.dev/api/v1/c8bfefc8-ae85-456c-b5da-7ea4afccae33/auth/login", {
+        email,
+        password,
+      });
+      if (response.status === 200) {
+        localStorage.setItem("token", response.data.token);
+        router.push("/dashboard");
+      } else {
+        alert("Email atau password salah!");
+      }
+    } catch (error) {
       alert("Email atau password salah!");
     }
   };

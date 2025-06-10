@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import axios from 'axios';
 
 const bobotKriteria = {
   luas_lahan: 5,
@@ -112,7 +113,8 @@ export default function PrediksiPupuk() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const input = Object.fromEntries(
       Object.entries(formData)
@@ -126,13 +128,26 @@ export default function PrediksiPupuk() {
       waktu: new Date().toISOString(),
     };
     setHasilPrediksi({ hasil, detail });
-    // Save to allReports array in localStorage
-    let allReports = [];
-    if (typeof window !== 'undefined') {
-      const data = localStorage.getItem('allReports');
-      if (data) allReports = JSON.parse(data);
-      allReports.push(report);
-      localStorage.setItem('allReports', JSON.stringify(allReports));
+    
+    // POST ke dataTrain dengan token
+    try {
+      const token = localStorage.getItem("token"); // Ambil token dari localStorage
+      await axios.post('https://database-query.paso.dev/api/v1/c8bfefc8-ae85-456c-b5da-7ea4afccae33/dataTrain', {
+        luasLahan: input.luas_lahan,
+        anggotaTani: input.anggota_tani,
+        hasilPanen: input.hasil_panen,
+        pemanfaatan: input.pemanfaatan,
+        statusLahan: input.status_lahan,
+        pendapatan: input.pendapatan,
+        rekomendasi: input.rekomendasi,
+        kelas: hasil // 'Layak' atau 'Tidak Layak'
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}` // Tambahkan token ke header
+        }
+      });
+    } catch (err) {
+      alert('Gagal menyimpan data ke server');
     }
   };
 
