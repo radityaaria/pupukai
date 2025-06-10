@@ -120,7 +120,20 @@ export default function PrediksiPupuk() {
         .map(([k, v]) => [k, parseInt(v)])
     );
     const { hasil, detail } = prediksiKNN(input);
+    const report = {
+      ...formData,
+      hasil,
+      waktu: new Date().toISOString(),
+    };
     setHasilPrediksi({ hasil, detail });
+    // Save to allReports array in localStorage
+    let allReports = [];
+    if (typeof window !== 'undefined') {
+      const data = localStorage.getItem('allReports');
+      if (data) allReports = JSON.parse(data);
+      allReports.push(report);
+      localStorage.setItem('allReports', JSON.stringify(allReports));
+    }
   };
 
   const handleExportPDF = async () => {
@@ -219,7 +232,7 @@ export default function PrediksiPupuk() {
             }}
           >
             <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 24, marginBottom: 8 }}>
-              Report Prediksi
+              Keterangan Hasil Penentuan Pupuk Organik
             </div>
             <div
               style={{
