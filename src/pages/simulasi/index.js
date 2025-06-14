@@ -129,9 +129,10 @@ export default function PrediksiPupuk() {
     };
     setHasilPrediksi({ hasil, detail });
     
-    // POST ke dataTrain dengan token
     try {
-      const token = localStorage.getItem("token"); // Ambil token dari localStorage
+      const token = localStorage.getItem("token");
+      
+      // Send to dataTrain
       await axios.post('https://database-query.paso.dev/api/v1/c8bfefc8-ae85-456c-b5da-7ea4afccae33/dataTrain', {
         luasLahan: input.luas_lahan,
         anggotaTani: input.anggota_tani,
@@ -140,10 +141,28 @@ export default function PrediksiPupuk() {
         statusLahan: input.status_lahan,
         pendapatan: input.pendapatan,
         rekomendasi: input.rekomendasi,
-        kelas: hasil // 'Layak' atau 'Tidak Layak'
+        kelas: hasil
       }, {
         headers: {
-          Authorization: `Bearer ${token}` // Tambahkan token ke header
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      // Send to history
+      await axios.post('https://database-query.paso.dev/api/v1/c8bfefc8-ae85-456c-b5da-7ea4afccae33/history', {
+        kelompokTani: formData.kelompok_tani,
+        alamat: formData.alamat,
+        luasLahan: input.luas_lahan,
+        jumlahAnggotaTani: input.anggota_tani,
+        produksiPanen: input.hasil_panen,
+        pemanfaatanBantuan: input.pemanfaatan,
+        statusLahan: input.status_lahan,
+        pendapatan: input.pendapatan,
+        rekomendasi: input.rekomendasi,
+        kelas: hasil
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
       });
     } catch (err) {
