@@ -137,7 +137,7 @@ export default function PrediksiPupuk() {
         luasLahan: input.luas_lahan,
         anggotaTani: input.anggota_tani,
         hasilPanen: input.hasil_panen,
-        pemanfaatan: input.pemanfaatan,
+        pemanfaatanBantuan: input.pemanfaatan,
         statusLahan: input.status_lahan,
         pendapatan: input.pendapatan,
         rekomendasi: input.rekomendasi,

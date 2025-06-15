@@ -8,7 +8,7 @@ const labelMap = {
   luasLahan: "Luas Lahan",
   jumlahAnggotaTani: "Jumlah Anggota Tani",
   produksiPanen: "Produksi Panen",
-  pemanfaatan: "Pemanfaatan Bantuan",
+  pemanfaatanBantuan: "Pemanfaatan Bantuan",
   statusLahan: "Status Lahan",
   pendapatan: "Pendapatan Musim",
   rekomendasi: "Rekomendasi Penyuluh",
@@ -20,7 +20,7 @@ const valueMap = {
   luasLahan: ['< 0.5 hektar', '0.5 - 1 hektar', '> 1 hektar'],
   jumlahAnggotaTani: ['< 10', '10 - 20', '> 20'],
   produksiPanen: ['< 1 ton', '1 - 2 ton', '> 2 ton'],
-  pemanfaatan: ['Pernah (tidak tepat guna)', 'Pernah (tepat guna)', 'Tidak pernah'],
+  pemanfaatanBantuan: ['Pernah (tidak tepat guna)', 'Pernah (tepat guna)', 'Tidak pernah'],
   statusLahan: ['Milik sendiri', 'Sewa', 'Bagi hasil'],
   pendapatan: ['> 5 juta', '2 - 5 juta', '< 2 juta'],
   rekomendasi: ['Tidak direkomendasikan', 'Direkomendasikan']
@@ -127,7 +127,7 @@ const Dashboard = () => {
 
   const handleInputChange = (field, value) => {
     // Convert numeric fields to numbers
-    const numericFields = ['luasLahan', 'anggotaTani', 'hasilPanen', 'pemanfaatan', 'statusLahan', 'pendapatan', 'rekomendasi'];
+    const numericFields = ['luasLahan', 'anggotaTani', 'hasilPanen', 'pemanfaatanBantuan', 'statusLahan', 'pendapatan', 'rekomendasi'];
     const convertedValue = numericFields.includes(field) ? parseInt(value) || 0 : value;
     
     setEditFormData(prev => ({
@@ -158,7 +158,7 @@ const Dashboard = () => {
     luasLahan: row.luasLahan,
     anggotaTani: row.anggotaTani,
     hasilPanen: row.hasilPanen,
-    pemanfaatan: row.pemanfaatan,
+    pemanfaatanBantuan: row.pemanfaatanBantuan,
     statusLahan: row.statusLahan,
     pendapatan: row.pendapatan,
     rekomendasi: row.rekomendasi,
@@ -247,7 +247,7 @@ const Dashboard = () => {
                   <thead>
                     <tr className="bg-slate-100">
                       <th className="p-2 border">No</th>
-                      {['luasLahan','anggotaTani','hasilPanen','pemanfaatan','statusLahan','pendapatan','rekomendasi','kelas'].map((key) => (
+                      {['luasLahan','anggotaTani','hasilPanen','pemanfaatanBantuan','statusLahan','pendapatan','rekomendasi','kelas'].map((key) => (
                         <th key={key} className="p-2 border">{labelMap[key] || key}</th>
                       ))}
                       <th className="p-2 border">Aksi</th>
@@ -259,7 +259,7 @@ const Dashboard = () => {
                       return (
                         <tr key={row._id} className="even:bg-slate-50">
                           <td className="p-2 border text-center">{idx + 1}</td>
-                          {['luasLahan','anggotaTani','hasilPanen','pemanfaatan','statusLahan','pendapatan','rekomendasi','kelas'].map((key) => (
+                          {['luasLahan','anggotaTani','hasilPanen','pemanfaatanBantuan','statusLahan','pendapatan','rekomendasi','kelas'].map((key) => (
                             <td key={key} className={key === 'kelas' ? `p-2 border text-center font-bold ${mapped[key] === 'Layak' ? 'bg-green-200 text-green-900' : mapped[key] === 'Tidak Layak' ? 'bg-red-200 text-red-900' : ''}` : 'p-2 border text-center'}>
                               {valueMap[key] ? valueMap[key][parseInt(mapped[key]) - 1] || mapped[key] : mapped[key]}
                             </td>
@@ -333,8 +333,8 @@ const Dashboard = () => {
               <div>
                 <label className="block text-sm font-medium mb-1">Pemanfaatan Bantuan</label>
                 <select 
-                  value={editFormData.pemanfaatan || ''} 
-                  onChange={(e) => handleInputChange('pemanfaatan', e.target.value)}
+                  value={editFormData.pemanfaatanBantuan || ''} 
+                  onChange={(e) => handleInputChange('pemanfaatanBantuan', e.target.value)}
                   className="w-full p-2 border rounded"
                 >
                   <option value="">Pilih Pemanfaatan Bantuan</option>
