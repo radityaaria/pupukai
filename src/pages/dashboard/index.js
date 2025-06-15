@@ -93,6 +93,24 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteHistory = async (id) => {
+    const confirmDelete = window.confirm("Apakah Anda yakin ingin menghapus data riwayat ini?");
+    if (confirmDelete) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`https://database-query.paso.dev/api/v1/c8bfefc8-ae85-456c-b5da-7ea4afccae33/history/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        alert("Data riwayat berhasil dihapus");
+        setReports(prevData => prevData.filter(item => item._id !== id));
+      } catch (err) {
+        alert("Gagal menghapus data riwayat");
+      }
+    }
+  };
+
   const mapApiRow = (row) => ({
     luasLahan: row.luasLahan,
     jumlahAnggotaTani: row.anggotaTani,
@@ -123,7 +141,7 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="p-10 flex flex-col items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-5xl">
+        <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-7xl">
           <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">Data Hasil Penentuan Penerima Bantuan Pupuk Organik</h1>
           {tab === 'riwayat' ? (
             loadingHistory ? (
@@ -141,6 +159,7 @@ const Dashboard = () => {
                       {Object.keys(labelMap).map((key) => (
                         <th key={key} className="p-2 border">{labelMap[key]}</th>
                       ))}
+                      <th className="p-2 border">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -163,6 +182,11 @@ const Dashboard = () => {
                               : report[key]}
                           </td>
                         ))}
+                        <td className="p-2 border text-center">
+                          <button onClick={() => handleDeleteHistory(report._id)} className="text-red-500 hover:text-red-700">
+                            <FaTrash />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
