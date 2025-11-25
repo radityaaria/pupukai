@@ -38,23 +38,16 @@ const Pengembang = () => {
         </div>
       </div>
       <p className="bg-slate-300 px-10 py-8 mt-4 text-xl">
-        Website ini merupakan hasil pengembangan dari sebuah proyek AI yang
-        dirancang untuk mendukung proses penerimaan pupuk secara cerdas dan
-        efisien. Proyek ini dikerjakan oleh mahasiswa Universitas Janabadra,
-        <span className="font-bold">Raditya Aria Ramadhani, Heri Agus Supriyanto, dan Albertus Lie</span>, sebagai
-        bagian dari tugas akhir dalam rangka proyek tugas akhir mata kuliah
-        Kecerdasan Buatan. Pengembangan proyek ini dilakukan di bawah bimbingan
-        dosen pembimbing kami, <span className="font-bold">Yumarlin MZ, S.Kom., M.Pd., M.Kom.</span>, yang telah
-        memberikan arahan, masukan, serta dukungan penuh selama seluruh proses
-        berlangsung. Tujuan utama dari website ini adalah untuk menyediakan
-        platform modern berbasis kecerdasan buatan yang mampu membantu pengguna
-        dalam melakukan analisis data dan pengambilan keputusan terkait
-        penerimaan pupuk. Dengan mengintegrasikan teknologi AI dan desain yang
-        responsif, kami berharap platform ini dapat memberikan solusi praktis
-        dan pengalaman terbaik bagi para penggunanya. Kami mengucapkan terima
-        kasih atas semua dukungan yang telah diberikan oleh Universitas
-        Janabadra, dosen pembimbing, serta semua pihak yang telah berkontribusi
-        dalam pengembangan proyek ini.
+        Website ini merupakan hasil pengembangan dari sebuah proyek sistem pakar yang dirancang untuk mendukung proses penentuan jenis pelanggaran lalu lintas dan besaran denda secara cerdas dan konsisten.
+        Proyek ini dikerjakan oleh mahasiswa Universitas Janabadra, yaitu <strong>Raditya Aria Ramadhani, Heri Agus Supriyanto, dan Albertus Lie</strong>, sebagai bagian dari tugas akhir pada mata kuliah Sistem Pakar.
+
+        Pengembangan sistem TilangExpert dilakukan di bawah bimbingan dosen pembimbing kami, <strong>Yumarlin MZ, S.Kom., M.Pd., M.Kom.</strong>, yang telah memberikan arahan, masukan, serta dukungan penuh selama seluruh proses perancangan dan implementasi berlangsung.
+
+        Tujuan utama dari website ini adalah untuk menyediakan platform digital berbasis Certainty Factor (CF) yang dapat membantu petugas maupun pengguna dalam melakukan klasifikasi pelanggaran lalu lintas dan menentukan besaran denda yang sesuai dengan peraturan hukum yang berlaku.
+
+        Dengan mengintegrasikan basis pengetahuan kasus, dan desain antarmuka yang responsif, kami berharap TilangExpert dapat menjadi solusi praktis untuk mendukung penegakan hukum yang lebih cepat, objektif, dan transparan.
+
+        Kami mengucapkan terima kasih atas segala dukungan yang telah diberikan oleh Universitas Janabadra, dosen pembimbing, serta seluruh pihak yang telah berkontribusi dalam pengembangan proyek ini.
       </p>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import client from "../../../libs/axios";
+import Link from "next/link";
+// import client from "../../../libs/axios";
 
 const Register = () => {
   const [nama, setNama] = useState("");
@@ -14,26 +15,26 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+console.log("data");
+    // try {
+    //   const response = await client.post("/auth/register", {
+    //     firstName: nama,
+    //     umur,
+    //     pekerjaan,
+    //     alamat,
+    //     email,
+    //     password,
+    //   });
 
-    try {
-      const response = await client.post("/auth/register", {
-        firstName: nama,
-        umur,
-        pekerjaan,
-        alamat,
-        email,
-        password,
-      });
-
-      if (response.status === 200) {
-        localStorage.setItem("token", response.data.token);
-        router.push("/simulasi");
-      } else {
-        alert("Pendaftaran gagal!");
-      }
-    } catch (error) {
-      alert("Terjadi kesalahan saat pendaftaran!");
-    }
+    //   if (response.status === 200) {
+    //     localStorage.setItem("token", response.data.token);
+    //     router.push("/simulasi");
+    //   } else {
+    //     alert("Pendaftaran gagal!");
+    //   }
+    // } catch (error) {
+    //   alert("Terjadi kesalahan saat pendaftaran!");
+    // }
   };
 
   return (
@@ -138,6 +139,12 @@ const Register = () => {
         >
           Register
         </button>
+        <p className="text-center mt-4 text-gray-600">
+          Sudah punya akun?{" "}
+          <Link href="/login" className="text-blue-500 hover:text-blue-700 hover:underline font-semibold">
+            Silahkan login
+          </Link>
+        </p>
       </form>
     </div>
   );

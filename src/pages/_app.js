@@ -7,7 +7,7 @@ export default function App({ Component, pageProps }) {
   return (
     <>
     <Head>
-        <title>AI Penerimaan Pupuk</title>
+        <title>TilangExpert</title>
         <meta name="description" content="Universitas Janabadra 2022" />
       </Head>
       <Navbar /> {/* Menambahkan komponen Navbar */}

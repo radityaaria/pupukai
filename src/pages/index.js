@@ -17,78 +17,85 @@ export default function Home() {
     <div
       className={`${geistSans.variable} min-h-screen`}
       style={{
-        backgroundImage: "url('/pupuk.jpg')",
+        backgroundImage: "url('/bghome.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      <header className="relative text-white text-center py-20 overflow-hidden">
+      <header className="relative text-white text-center py-12 overflow-hidden">
         <div className="absolute inset-0 bg-slate-200/70 z-0"></div>
         <div className="relative text-black z-10">
           <h1 className="text-4xl font-bold">
-            APLIKASI PENENTUAN BANTUAN PUPUK
+          TILANGEXPERT
           </h1>
           <p className="mt-4 text-lg">
-            Solusi Cerdas untuk Bantuan Petani Bantul
+          Solusi Cerdas untuk Penentuan Pelanggaran dan Lalu Lintas
           </p>
         </div>
       </header>
-      <div className="mt-1 p-8 bg-gray-100/60 rounded-lg px-12 text-center">
-        <p className="text-black z-10">Proses seleksi bantuan sering lambat dan kurang transparan. Sistem ini
-        menggunakan analisis data untuk menilai kelayakan secara objektif,
-        sehingga proses menjadi lebih cepat, adil, dan terpercaya.</p>
-      </div>
-      <main className="p-8">
-        <h2 className="text-2xl text-white font-semibold mb-4">
-          Serah Terima Bantuan Pupuk Organik
-        </h2>
+      {/* <div className="mt-1 p-8 bg-gray-100/60 rounded-lg px-12 text-center">
+        <p className="text-black z-10"> Proses penentuan pelanggaran lalu lintas sering kali tidak konsisten karena
+      perbedaan interpretasi di lapangan dan keterbatasan rujukan kasus serupa. {""}
+      <strong>TilangExpert</strong> membantu petugas menilai jenis
+      pelanggaran (ringan, sedang, atau berat) serta besaran denda yang sesuai
+      dengan Undang-Undang Lalu Lintas.
+      Dengan sistem ini, proses penegakan hukum menjadi lebih {""}
+      <strong>cepat, adil, dan transparan</strong>.</p>
+      </div> */}
+      <main className="p-4">
+        {/* <h2 className="text-2xl text-black font-bold mb-4">
+          Contoh Jenis Pelanggaran dan Denda Lalu Lintas
+        </h2> */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative border rounded-lg p-4 overflow-hidden">
+          <div className="relative border rounded-lg p-3 overflow-hidden">
             <div className="absolute inset-0 bg-slate-200/60 rounded-lg z-0"></div>
             <div className="relative z-10">
-              <div className="relative w-full pb-[100%]">
+              <div className="relative w-full pb-[50%]">
                 <Image
-                  src="/polres1.jpeg"
+                  src="/pelanggaran1.jpeg"
                   alt="Produk 1"
                   layout="fill"
                   objectFit="cover"
                   className="rounded"
                 />
               </div>
-              <h3 className="font-bold mt-2">KWT Puspa Gemari Kedaton</h3>
-              <p className="text-gray-800">Pleret</p>
+              <h3 className="font-bold mt-2 text-sm">Tidak memakai helm</h3>
+              <p className="text-black text-sm">Pasal 291 ayat (1)</p>
+              <p className="text-black text-sm">Rp. 250.000 (Ringan)</p>
             </div>
           </div>
-          <div className="relative border rounded-lg p-4 overflow-hidden">
+          <div className="relative border rounded-lg p-3 overflow-hidden">
             <div className="absolute inset-0 bg-slate-200/60 rounded-lg z-0"></div>
             <div className="relative z-10">
-              <div className="relative w-full pb-[100%]">
+              <div className="relative w-full pb-[50%]">
                 <Image
-                  src="/polres2.jpeg"
+                  src="/pelanggaran2.jpeg"
                   alt="Produk 2"
                   layout="fill"
                   objectFit="cover"
                   className="rounded"
                 />
               </div>
-              <h3 className="font-bold mt-2">KWT Guyub Rukun Gadingharjo</h3>
-              <p className="text-gray-800">Sanden</p>
+              <h3 className="font-bold mt-2 text-sm">Menggunakan knalpot bising</h3>
+              <p className="text-black text-sm">Pasal 285 ayat (1)</p>
+              <p className="text-black text-sm">Rp. 250.000 (Ringan)</p>
             </div>
           </div>
-          <div className="relative border rounded-lg p-4 overflow-hidden">
+          <div className="relative border rounded-lg p-3 overflow-hidden">
             <div className="absolute inset-0 bg-slate-200/60 rounded-lg z-0"></div>
             <div className="relative z-10">
-              <div className="relative w-full pb-[100%]">
+              <div className="relative w-full pb-[50%]">
                 <Image
-                  src="/polres3.jpeg"
+                  src="/pelanggaran3.jpeg"
                   alt="Produk 3"
                   layout="fill"
                   objectFit="cover"
                   className="rounded"
                 />
               </div>
-              <h3 className="font-bold mt-2">KWT Sari Dewi II Gubug Argosari</h3>
-              <p className="text-gray-800">Sedayu</p>
+              <h3 className="font-bold mt-2 text-sm">Kendaraan parkir di tempat terlarang / trotoar</h3>
+              <p className="text-black text-sm">Pasal 287 ayat (3)</p>
+              <p className="text-black text-sm">Rp. 250.000 (Ringan)</p>
             </div>
           </div>
         </div>

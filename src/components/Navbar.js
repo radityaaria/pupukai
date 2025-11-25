@@ -4,7 +4,7 @@ import { IoIosLogIn } from "react-icons/io";
 const Navbar = () => {
   return (
     <nav className="flex justify-between items-center p-4 bg-gray-800 text-white">
-      <div className="text-2xl font-bold tracking-widest">PUPUK AI</div>
+      <div className="text-2xl font-bold tracking-widest">TilangExpert</div>
       <ul className="flex space-x-4">
         <li>
           <a href="/" className="hover:text-gray-400">
@@ -27,17 +27,23 @@ const Navbar = () => {
           </a>
         </li>
         <li>
-          <a href="/simulasi" className="hover:text-gray-400">
-            Simulasi Kelayakan Bantuan
+          <a href="/pelanggaran" className="hover:text-gray-400">
+            Identifikasi Pelanggaran
           </a>
         </li>
+        {/* <li>
+          <a href="/dokumentasi" className="hover:text-gray-400">
+            Dokumentasi & Wawancara
+          </a>
+        </li> */}
       </ul>
       <a
         href="/login"
         className="flex items-center gap-2 bg-white text-black px-3 py-2 rounded hover:bg-slate-200 transition font-semibold"
         style={{ minWidth: 44 }}
       >
-        <IoIosLogIn className="h-8 w-8 font-bold" />
+        <span className="text-sm">Login</span>
+        <IoIosLogIn className="h-5 w-5 font-bold" />
       </a>
     </nav>
   );

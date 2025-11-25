@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import axios from "axios";
 
 const Login = () => {
@@ -73,6 +74,12 @@ const Login = () => {
         >
           Masuk
         </button>
+        <p className="text-center mt-4 text-gray-600">
+          Belum punya akun?{" "}
+          <Link href="/register" className="text-blue-500 hover:text-blue-700 hover:underline font-semibold">
+            Silahkan register
+          </Link>
+        </p>
       </form>
     </div>
   );

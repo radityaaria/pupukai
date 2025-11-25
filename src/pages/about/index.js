@@ -13,27 +13,19 @@ const About = () => {
       <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
         <div className="flex-1 space-y-4 text-lg">
           <h1 className="text-3xl font-bold mt-4 text-center md:text-left">
-            Selamat Datang di Pupuk AI
+            Selamat Datang di Tilang Expert
           </h1>
           <p>
-            Website ini merupakan platform sistem pendukung keputusan yang
-            dirancang untuk membantu proses penentuan kelayakan penerimaan
-            bantuan pupuk secara lebih cepat, akurat, dan objektif. Sistem ini
-            dikembangkan menggunakan metode K-Nearest Neighbor (KNN) yang
-            memanfaatkan data historis untuk mengidentifikasi calon penerima
-            bantuan yang paling memenuhi kriteria.
+            Website ini merupakan platform sistem pakar berbasis web yang dirancang untuk membantu proses penentuan jenis pelanggaran lalu lintas serta besaran denda secara objektif dan konsisten.
+            Sistem ini dikembangkan menggunakan metode Certainty Factor (CF), yaitu pendekatan kecerdasan buatan yang menggunakan faktor kepastian untuk menghitung tingkat keyakinan terhadap suatu kesimpulan berdasarkan aturan-aturan yang telah ditetapkan.
           </p>
           <p>
-            Dengan menggabungkan teknologi kecerdasan buatan dan algoritma
-            pembelajaran mesin, kami berharap sistem ini dapat menjadi solusi
-            transparan dan efisien dalam distribusi bantuan pupuk kepada petani
-            yang membutuhkan. Website ini dibuat sebagai bagian dari proyek
-            pengembangan berbasis riset dan tugas akhir.
+            Dengan penerapan metode CF, TilangExpert dapat menghitung tingkat kepastian dari setiap indikator pelanggaran, menggabungkan nilai certainty factor dari berbagai gejala yang teridentifikasi, menampilkan rekomendasi klasifikasi dan denda sesuai Undang-Undang Lalu Lintas Kepolisian Republik Indonesia, serta memberikan transparansi dalam proses penegakan hukum.
           </p>
           <p>
-            Jelajahi fitur kami dan lihat bagaimana AI dapat berperan penting
-            dalam mendukung kebijakan pertanian yang lebih adil dan tepat
-            sasaran.
+            Website ini merupakan bagian dari proyek pengembangan berbasis riset dan tugas akhir dalam bidang Sistem Pakar.
+
+            Jelajahi fitur kami dan lihat bagaimana TilangExpert berperan dalam mendukung digitalisasi penegakan hukum yang lebih adil, efisien, dan terstandar.
           </p>
         </div>
         <div className="flex-1">
@@ -53,20 +45,19 @@ const About = () => {
           metode K-Nearest Neighbor (KNN) sebagai inti dari penentuan kriteria.
         </p> */}
         <p className="text-xl">
-          Penelitian ini berfokus pada pengembangan sebuah platform digital yang
-          bertujuan membantu menentukan kelayakan penerimaan bantuan pupuk.
-          Tujuannya adalah membuat proses seleksi penerima bantuan lebih
-          objektif, efisien, dan berdasarkan data. Selain itu, penelitian ini
-          juga mengkaji bagaimana pemanfaatan kecerdasan buatan dapat
-          meningkatkan transparansi dan akurasi dalam penyaluran bantuan, serta
-          dampaknya terhadap efektivitas program subsidi pertanian. Dengan
-          mengintegrasikan teknologi ini ke dalam proses evaluasi, diharapkan
-          platform ini dapat berkontribusi positif pada pengambilan kebijakan
-          yang lebih adil dan tepat sasaran di sektor pertanian. Objek
-          penelitian ini secara spesifik adalah program penyaluran pupuk organik
-          yang akan dibagikan setiap bulan kepada kelompok tani yang memenuhi
-          kriteria kelayakan. Program ini secara eksklusif ditujukan untuk
-          kelompok tani yang berlokasi di wilayah Bantul.
+          Penelitian ini berfokus pada pengembangan sistem pakar berbasis CF (Certainty Factor) untuk membantu petugas dalam menentukan tingkat pelanggaran dan besaran denda secara cepat dan sesuai hukum.
+          Tujuan utamanya adalah menciptakan sistem yang dapat meningkatkan konsistensi keputusan, akurasi penilaian, dan transparansi proses tilang di lapangan.
+        </p>
+        <p className="text-xl mt-4">
+          Selain itu, penelitian ini juga mengkaji bagaimana penerapan Certainty Factor dapat membantu aparat kepolisian dalam:
+        </p>
+        <ul className="text-xl list-disc list-inside ml-4 space-y-2">
+          <li>Mengidentifikasi jenis pelanggaran berdasarkan ciri-ciri kejadian,</li>
+          <li>Menentukan besaran denda sesuai pasal hukum,</li>
+          <li>Menyimpan dan memperbarui basis data kasus baru secara otomatis setelah diverifikasi.</li>
+        </ul>
+        <p className="text-xl mt-4">
+          Objek penelitian difokuskan pada kasus pelanggaran lalu lintas umum di wilayah Yogyakarta dan sekitarnya, dengan studi awal melibatkan POLRES Bantul sebagai acuan data hukum dan klasifikasi pelanggaran yang berlaku.
         </p>
         <p className="mt-4 text-xl">
           Jika Anda memiliki pertanyaan, silakan hubungi kami melalui informasi
