@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import axios from "axios";
+import { supabase } from "~/libs/supabaseClient";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,15 +11,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("https://database-query.paso.dev/api/v1/c8bfefc8-ae85-456c-b5da-7ea4afccae33/auth/login", {
+      const response = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (response.status === 200) {
-        localStorage.setItem("token", response.data.token);
-        router.push("/dashboard");
-      } else {
+
+      if (response.error) {
         alert("Email atau password salah!");
+      } else {
+        localStorage.setItem("token", response.data.session.access_token);
+        router.push("/dashboard");
       }
     } catch (error) {
       alert("Email atau password salah!");
@@ -35,9 +36,7 @@ const Login = () => {
         onSubmit={handleSubmit}
         className="space-y-4 bg-white shadow-xl rounded-xl p-8 w-full max-w-2xl transform hover:scale-[1.01] transition-transform duration-300"
       >
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Silahkan Login
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 text-center">Silahkan Login</h1>
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-4">
             <div>
@@ -76,7 +75,10 @@ const Login = () => {
         </button>
         <p className="text-center mt-4 text-gray-600">
           Belum punya akun?{" "}
-          <Link href="/register" className="text-blue-500 hover:text-blue-700 hover:underline font-semibold">
+          <Link
+            href="/register"
+            className="text-blue-500 hover:text-blue-700 hover:underline font-semibold"
+          >
             Silahkan register
           </Link>
         </p>
