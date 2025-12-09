@@ -45,6 +45,15 @@ const Dashboard = () => {
   const [rulebase, setRulebase] = useState([]);
   const [loadingRulebase, setLoadingRulebase] = useState(false);
   const [errorRulebase, setErrorRulebase] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [newRuleData, setNewRuleData] = useState({
+    // State for new rule form data
+    kode_rule: "",
+    deskripsi: "",
+    pasal: "",
+    denda: "",
+    cf_pakar: "",
+  });
 
   useEffect(() => {
     if (tab === "rulebase" && rulebase.length === 0 && !loadingRulebase) {
@@ -69,26 +78,16 @@ const Dashboard = () => {
     }
   }, [tab]);
 
-  // Since only rulebase tab is active, we don't need these functions/states related to other tabs
-  // const [reports, setReports] = useState([]);
-  // const [dataTrain, setDataTrain] = useState([]);
-  // const [loadingTrain, setLoadingTrain] = useState(false);
-  // const [errorTrain, setErrorTrain] = useState(null);
-  // const [loadingHistory, setLoadingHistory] = useState(false);
-  // const [errorHistory, setErrorHistory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
   const mapApiRow = (row) => ({
-    luasLahan: row.luasLahan,
-    anggotaTani: row.anggotaTani,
-    hasilPanen: row.hasilPanen,
-    pemanfaatanBantuan: row.pemanfaatanBantuan,
-    statusLahan: row.statusLahan,
-    pendapatan: row.pendapatan,
-    rekomendasi: row.rekomendasi,
-    kelas: row.kelas,
+    kode_rule: row.kode_rule,
+    deskripsi: row.deskripsi,
+    pasal: row.pasal,
+    denda: row.denda,
+    cf_pakar: row.cf_pakar,
   });
 
   const handleDelete = async (id) => {
@@ -97,13 +96,23 @@ const Dashboard = () => {
     );
     if (confirmDelete) {
       try {
-        const { error } = await supabase.from("rulebase").delete().eq("id", id);
+        const { error } = await supabase
+          .from("rulebase")
+          .delete()
+          .eq("id_rule", id);
 
         if (error) {
           throw error;
         }
         alert("Data berhasil dihapus");
-        setRulebase((prevData) => prevData.filter((item) => item.id !== id));
+        // Refetch rulebase data after successful deletion
+        const { data: updatedRules, error: fetchError } = await supabase
+          .from("rulebase")
+          .select("*");
+        if (fetchError) {
+          throw fetchError;
+        }
+        setRulebase(updatedRules);
       } catch (err) {
         console.error("Error deleting rulebase:", err);
         alert("Gagal menghapus data");
@@ -120,10 +129,12 @@ const Dashboard = () => {
 
   const handleUpdate = async () => {
     try {
+      console.log("Updating rule with ID:", selectedData.id_rule);
+      console.log("Update payload:", editFormData);
       const { error } = await supabase
         .from("rulebase")
         .update(editFormData)
-        .eq("id", selectedData.id);
+        .eq("id_rule", selectedData.id_rule);
 
       if (error) {
         throw error;
@@ -145,17 +156,9 @@ const Dashboard = () => {
   };
 
   const handleInputChange = (field, value) => {
-    const numericFields = [
-      "luasLahan",
-      "anggotaTani",
-      "hasilPanen",
-      "pemanfaatanBantuan",
-      "statusLahan",
-      "pendapatan",
-      "rekomendasi",
-    ];
+    const numericFields = ["denda", "cf_pakar"];
     const convertedValue = numericFields.includes(field)
-      ? parseInt(value) || 0
+      ? (field === "denda" ? parseInt(value) : parseFloat(value)) || 0
       : value;
 
     setEditFormData((prev) => ({
@@ -164,8 +167,51 @@ const Dashboard = () => {
     }));
   };
 
+  const handleModalChange = (e) => {
+    const { name, value } = e.target;
+    setNewRuleData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateRule = async () => {
+    try {
+      const { data, error } = await supabase.from("rulebase").insert([
+        {
+          kode_rule: newRuleData.kode_rule,
+          deskripsi: newRuleData.deskripsi,
+          pasal: newRuleData.pasal,
+          denda: parseInt(newRuleData.denda),
+          cf_pakar: parseFloat(newRuleData.cf_pakar),
+        },
+      ]);
+
+      if (error) {
+        throw error;
+      }
+
+      alert("Rule added successfully!");
+      setNewRuleData({
+        kode_rule: "",
+        deskripsi: "",
+        pasal: "",
+        denda: "",
+        cf_pakar: "",
+      });
+      setIsModalOpen(false);
+      // Refresh rulebase data after successful creation
+      const { data: updatedRules, error: fetchError } = await supabase
+        .from("rulebase")
+        .select("*");
+      if (fetchError) {
+        throw fetchError;
+      }
+      setRulebase(updatedRules);
+    } catch (error) {
+      alert("Error adding rule: " + error.message);
+    }
+  };
+
   const handleCreate = () => {
-    alert("Create function is not implemented in this version.");
+    setIsModalOpen(true);
   };
 
   return (
@@ -183,16 +229,16 @@ const Dashboard = () => {
             Rulebase
           </button>
         </div>
+      </div>
+      <div className="p-10 flex flex-col items-center justify-center">
         <div className="flex gap-4 justify-center mt-4">
           <button
             onClick={handleCreate}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center"
+            className="mt-2 mb-4 bg-green-600 text-white rounded hover:bg-green-800 flex items-center p-2"
           >
             <FaPlus className="mr-2" /> Create
           </button>
         </div>
-      </div>
-      <div className="p-10 flex flex-col items-center justify-center">
         <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-7xl">
           <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">
             Rule Base Tilang Expert
@@ -253,7 +299,7 @@ const Dashboard = () => {
                           <FaEdit />
                         </button>
                         <button
-                          onClick={() => handleDelete(rule.id)}
+                          onClick={() => handleDelete(rule.id_rule)}
                           className="text-red-500 hover:text-red-700"
                         >
                           <FaTrash />
@@ -272,139 +318,70 @@ const Dashboard = () => {
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Edit Data Training</h2>
+            <h2 className="text-xl font-bold mb-4">Edit Rule</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Luas Lahan
+                  Kode Rule
                 </label>
-                <select
-                  value={editFormData.luasLahan || ""}
+                <input
+                  type="text"
+                  name="kode_rule"
+                  value={editFormData.kode_rule || ""}
                   onChange={(e) =>
-                    handleInputChange("luasLahan", e.target.value)
+                    handleInputChange("kode_rule", e.target.value)
                   }
                   className="w-full p-2 border rounded"
-                >
-                  <option value="">Pilih Luas Lahan</option>
-                  <option value="1">&lt; 0.5 hektar</option>
-                  <option value="2">0.5 - 1 hektar</option>
-                  <option value="3">&gt; 1 hektar</option>
-                </select>
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Jumlah Anggota Tani
+                  Deskripsi
                 </label>
-                <select
-                  value={editFormData.anggotaTani || ""}
+                <textarea
+                  name="deskripsi"
+                  value={editFormData.deskripsi || ""}
                   onChange={(e) =>
-                    handleInputChange("anggotaTani", e.target.value)
+                    handleInputChange("deskripsi", e.target.value)
                   }
                   className="w-full p-2 border rounded"
-                >
-                  <option value="">Pilih Jumlah Anggota</option>
-                  <option value="1">&lt; 10</option>
-                  <option value="2">10 - 20</option>
-                  <option value="3">&gt; 20</option>
-                </select>
+                  rows="3"
+                ></textarea>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Pasal</label>
+                <input
+                  type="text"
+                  name="pasal"
+                  value={editFormData.pasal || ""}
+                  onChange={(e) => handleInputChange("pasal", e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Denda</label>
+                <input
+                  type="number"
+                  name="denda"
+                  value={editFormData.denda || ""}
+                  onChange={(e) => handleInputChange("denda", e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Produksi Panen
+                  CF Pakar
                 </label>
-                <select
-                  value={editFormData.hasilPanen || ""}
+                <input
+                  type="number"
+                  step="0.01"
+                  name="cf_pakar"
+                  value={editFormData.cf_pakar || ""}
                   onChange={(e) =>
-                    handleInputChange("hasilPanen", e.target.value)
+                    handleInputChange("cf_pakar", e.target.value)
                   }
                   className="w-full p-2 border rounded"
-                >
-                  <option value="">Pilih Produksi Panen</option>
-                  <option value="1">&lt; 1 ton</option>
-                  <option value="2">1 - 2 ton</option>
-                  <option value="3">&gt; 2 ton</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Pemanfaatan Bantuan
-                </label>
-                <select
-                  value={editFormData.pemanfaatanBantuan || ""}
-                  onChange={(e) =>
-                    handleInputChange("pemanfaatanBantuan", e.target.value)
-                  }
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Pilih Pemanfaatan Bantuan</option>
-                  <option value="1">Pernah (tidak tepat guna)</option>
-                  <option value="2">Pernah (tepat guna)</option>
-                  <option value="3">Tidak pernah</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Status Lahan
-                </label>
-                <select
-                  value={editFormData.statusLahan || ""}
-                  onChange={(e) =>
-                    handleInputChange("statusLahan", e.target.value)
-                  }
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Pilih Status Lahan</option>
-                  <option value="1">Milik sendiri</option>
-                  <option value="2">Sewa</option>
-                  <option value="3">Bagi hasil</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Pendapatan Musim
-                </label>
-                <select
-                  value={editFormData.pendapatan || ""}
-                  onChange={(e) =>
-                    handleInputChange("pendapatan", e.target.value)
-                  }
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Pilih Pendapatan</option>
-                  <option value="1">&gt; 5 juta</option>
-                  <option value="2">2 - 5 juta</option>
-                  <option value="3">&lt; 2 juta</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Rekomendasi Penyuluh
-                </label>
-                <select
-                  value={editFormData.rekomendasi || ""}
-                  onChange={(e) =>
-                    handleInputChange("rekomendasi", e.target.value)
-                  }
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Pilih Rekomendasi</option>
-                  <option value="1">Tidak direkomendasikan</option>
-                  <option value="2">Direkomendasikan</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Hasil Prediksi
-                </label>
-                <select
-                  value={editFormData.kelas || ""}
-                  onChange={(e) => handleInputChange("kelas", e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Pilih Hasil Prediksi</option>
-                  <option value="Layak">Layak</option>
-                  <option value="Tidak Layak">Tidak Layak</option>
-                </select>
+                />
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6">
@@ -421,6 +398,124 @@ const Dashboard = () => {
                 Simpan
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for creating new rule */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-auto">
+            <h2 className="text-xl font-bold mb-4">Create New Rule</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleCreateRule();
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label
+                  htmlFor="kode_rule"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Kode Rule
+                </label>
+                <input
+                  type="text"
+                  name="kode_rule"
+                  id="kode_rule"
+                  value={newRuleData.kode_rule}
+                  onChange={handleModalChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="deskripsi"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Deskripsi
+                </label>
+                <textarea
+                  name="deskripsi"
+                  id="deskripsi"
+                  value={newRuleData.deskripsi}
+                  onChange={handleModalChange}
+                  rows="3"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                ></textarea>
+              </div>
+              <div>
+                <label
+                  htmlFor="pasal"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Pasal
+                </label>
+                <input
+                  type="text"
+                  name="pasal"
+                  id="pasal"
+                  value={newRuleData.pasal}
+                  onChange={handleModalChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="denda"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Denda
+                </label>
+                <input
+                  type="text"
+                  name="denda"
+                  id="denda"
+                  value={newRuleData.denda}
+                  onChange={handleModalChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="cf_pakar"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  CF Pakar
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="cf_pakar"
+                  id="cf_pakar"
+                  value={newRuleData.cf_pakar}
+                  onChange={handleModalChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Create
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

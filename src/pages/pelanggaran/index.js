@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import axios from 'axios';
+import { useState, useRef } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import axios from "axios";
+import { supabase } from "../../../libs/supabaseClient";
 
 const bobotKriteria = {
   luas_lahan: 5,
@@ -12,7 +13,7 @@ const bobotKriteria = {
   pemanfaatan: 4,
   status_lahan: 3,
   pendapatan: 3,
-  rekomendasi: 2
+  rekomendasi: 2,
 };
 
 const dataset = [
@@ -24,7 +25,7 @@ const dataset = [
     status_lahan: 3,
     pendapatan: 3,
     rekomendasi: 2,
-    kelas: "Layak"
+    kelas: "Layak",
   },
   {
     luas_lahan: 1,
@@ -34,7 +35,7 @@ const dataset = [
     status_lahan: 2,
     pendapatan: 1,
     rekomendasi: 1,
-    kelas: "Tidak Layak"
+    kelas: "Tidak Layak",
   },
   {
     luas_lahan: 3,
@@ -44,7 +45,7 @@ const dataset = [
     status_lahan: 1,
     pendapatan: 1,
     rekomendasi: 1,
-    kelas: "Tidak Layak"
+    kelas: "Tidak Layak",
   },
   {
     luas_lahan: 3,
@@ -54,7 +55,7 @@ const dataset = [
     status_lahan: 2,
     pendapatan: 2,
     rekomendasi: 2,
-    kelas: "Layak"
+    kelas: "Layak",
   },
   {
     luas_lahan: 2,
@@ -64,8 +65,8 @@ const dataset = [
     status_lahan: 1,
     pendapatan: 2,
     rekomendasi: 2,
-    kelas: "Tidak Layak"
-  }
+    kelas: "Tidak Layak",
+  },
 ];
 
 function hitungJarak(data1, data2) {
@@ -78,51 +79,99 @@ function hitungJarak(data1, data2) {
 }
 
 function prediksiKNN(inputData, k = 3) {
-  const jarakSemua = dataset.map(data => {
+  const jarakSemua = dataset.map((data) => {
     return { jarak: hitungJarak(inputData, data), kelas: data.kelas };
   });
   jarakSemua.sort((a, b) => a.jarak - b.jarak);
   const tetangga = jarakSemua.slice(0, k);
   const count = {};
-  tetangga.forEach(t => {
+  tetangga.forEach((t) => {
     count[t.kelas] = (count[t.kelas] || 0) + 1;
   });
   return {
     hasil: Object.entries(count).sort((a, b) => b[1] - a[1])[0][0],
-    detail: tetangga
+    detail: tetangga,
   };
 }
 
 const pertanyaanPelanggaran = [
-  { id: 'tidak_memakai_helm_sni', label: 'Pengendara tidak memakai helm standar SNI' },
-  { id: 'melewati_lampu_merah', label: 'Melewati lampu merah saat menyala merah' },
-  { id: 'melebihi_batas_kecepatan_kota', label: 'Mengendarai melebihi batas kecepatan (≥100 km/jam di kota)' },
-  { id: 'menggunakan_ponsel_saat_berkendara', label: 'Menggunakan ponsel saat berkendara' },
-  { id: 'mengemudi_dalam_pengaruh_alkohol', label: 'Mengemudi dalam keadaan mabuk/alkohol tinggi' },
-  { id: 'parkir_di_tempat_terlarang', label: 'Kendaraan parkir di tempat terlarang/trotoar' },
-  { id: 'balapan_liar', label: 'Terlibat balapan liar di jalan umum' },
-  { id: 'melebihi_kapasitas_muatan', label: 'Mengangkut penumpang/muatan melebihi kapasitas' },
-  { id: 'lampu_tidak_menyala_malam_hari', label: 'Lampu kendaraan tidak menyala pada malam hari' },
-  { id: 'menyalip_di_garis_ganda', label: 'Menyalip di garis ganda/melanggar marka jalan' },
-  { id: 'tidak_bawa_atau_tidak_punya_sim', label: 'Tidak membawa/memiliki SIM saat diperiksa' },
-  { id: 'tidak_membawa_stnk', label: 'Tidak membawa STNK kendaraan' },
-  { id: 'mengabaikan_perintah_petugas', label: 'Mengabaikan perintah petugas lalu lintas' },
-  { id: 'tanpa_plat_nomor', label: 'Mengemudi tanpa plat nomor kendaraan' },
-  { id: 'knalpot_bising', label: 'Menggunakan knalpot bising (tidak standar)' },
-  { id: 'asap_kendaraan_berlebih', label: 'Kendaraan mengeluarkan asap berlebih' },
-  { id: 'tidak_menyalakan_lampu_sein', label: 'Tidak menyalakan lampu sein saat berbelok' },
-  { id: 'ugal_ugalan_menyebabkan_kecelakaan', label: 'Mengemudi ugal-ugalan menyebabkan kecelakaan' },
-  { id: 'kendaraan_tidak_layak_jalan', label: 'Menggunakan kendaraan tidak laik jalan (rem rusak, ban gundul)' },
-  { id: 'menghalangi_arus_lalu_lintas', label: 'Menghalangi arus lalu lintas saat berhenti' },
+  {
+    id: "tidak_memakai_helm_sni",
+    label: "Pengendara tidak memakai helm standar SNI",
+  },
+  {
+    id: "melewati_lampu_merah",
+    label: "Melewati lampu merah saat menyala merah",
+  },
+  {
+    id: "melebihi_batas_kecepatan_kota",
+    label: "Mengendarai melebihi batas kecepatan (≥100 km/jam di kota)",
+  },
+  {
+    id: "menggunakan_ponsel_saat_berkendara",
+    label: "Menggunakan ponsel saat berkendara",
+  },
+  {
+    id: "mengemudi_dalam_pengaruh_alkohol",
+    label: "Mengemudi dalam keadaan mabuk/alkohol tinggi",
+  },
+  {
+    id: "parkir_di_tempat_terlarang",
+    label: "Kendaraan parkir di tempat terlarang/trotoar",
+  },
+  { id: "balapan_liar", label: "Terlibat balapan liar di jalan umum" },
+  {
+    id: "melebihi_kapasitas_muatan",
+    label: "Mengangkut penumpang/muatan melebihi kapasitas",
+  },
+  {
+    id: "lampu_tidak_menyala_malam_hari",
+    label: "Lampu kendaraan tidak menyala pada malam hari",
+  },
+  {
+    id: "menyalip_di_garis_ganda",
+    label: "Menyalip di garis ganda/melanggar marka jalan",
+  },
+  {
+    id: "tidak_bawa_atau_tidak_punya_sim",
+    label: "Tidak membawa/memiliki SIM saat diperiksa",
+  },
+  { id: "tidak_membawa_stnk", label: "Tidak membawa STNK kendaraan" },
+  {
+    id: "mengabaikan_perintah_petugas",
+    label: "Mengabaikan perintah petugas lalu lintas",
+  },
+  { id: "tanpa_plat_nomor", label: "Mengemudi tanpa plat nomor kendaraan" },
+  { id: "knalpot_bising", label: "Menggunakan knalpot bising (tidak standar)" },
+  {
+    id: "asap_kendaraan_berlebih",
+    label: "Kendaraan mengeluarkan asap berlebih",
+  },
+  {
+    id: "tidak_menyalakan_lampu_sein",
+    label: "Tidak menyalakan lampu sein saat berbelok",
+  },
+  {
+    id: "ugal_ugalan_menyebabkan_kecelakaan",
+    label: "Mengemudi ugal-ugalan menyebabkan kecelakaan",
+  },
+  {
+    id: "kendaraan_tidak_layak_jalan",
+    label: "Menggunakan kendaraan tidak laik jalan (rem rusak, ban gundul)",
+  },
+  {
+    id: "menghalangi_arus_lalu_lintas",
+    label: "Menghalangi arus lalu lintas saat berhenti",
+  },
 ];
 
 const opsiJawaban = [
-  { value: 'tidak_tahu', label: 'Tidak tahu / Tidak terjadi' },
-  { value: 'mungkin_tidak', label: 'Mungkin tidak' },
-  { value: 'mungkin_ya', label: 'Mungkin ya' },
-  { value: 'kemungkinan_besar_ya', label: 'Kemungkinan besar ya' },
-  { value: 'hampir_pasti_ya', label: 'Hampir pasti ya' },
-  { value: 'pasti_ya', label: 'Pasti ya' },
+  { value: "tidak_tahu", label: "Tidak tahu / Tidak terjadi" },
+  { value: "mungkin_tidak", label: "Mungkin tidak" },
+  { value: "mungkin_ya", label: "Mungkin ya" },
+  { value: "kemungkinan_besar_ya", label: "Kemungkinan besar ya" },
+  { value: "hampir_pasti_ya", label: "Hampir pasti ya" },
+  { value: "pasti_ya", label: "Pasti ya" },
 ];
 
 const jawabanLabelMap = opsiJawaban.reduce((acc, opsi) => {
@@ -133,12 +182,20 @@ const jawabanLabelMap = opsiJawaban.reduce((acc, opsi) => {
 
 export default function PrediksiPupuk() {
   const [formData, setFormData] = useState({
-    nama_pelanggar: '',
-    alamat: '',
+    nama_pelanggar: "",
+    alamat: "",
     ...pertanyaanPelanggaran.reduce((acc, q) => {
-      acc[q.id] = '';
+      acc[q.id] = "";
       return acc;
-    }, {})
+    }, {}),
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newRuleData, setNewRuleData] = useState({
+    kode_rule: "",
+    deskripsi: "",
+    pasal: "",
+    denda: "",
+    cf_pakar: "",
   });
   const [hasilPrediksi, setHasilPrediksi] = useState(null);
   const [ringkasanJawaban, setRingkasanJawaban] = useState(null);
@@ -146,16 +203,50 @@ export default function PrediksiPupuk() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleModalChange = (e) => {
+    const { name, value } = e.target;
+    setNewRuleData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateRule = async () => {
+    try {
+      const { data, error } = await supabase.from("rulebase").insert([
+        {
+          kode_rule: newRuleData.kode_rule,
+          deskripsi: newRuleData.deskripsi,
+          pasal: newRuleData.pasal,
+          denda: parseInt(newRuleData.denda),
+          cf_pakar: parseFloat(newRuleData.cf_pakar),
+        },
+      ]);
+
+      if (error) {
+        throw error;
+      }
+
+      alert("Rule added successfully!");
+      setNewRuleData({
+        kode_rule: "",
+        deskripsi: "",
+        pasal: "",
+        denda: "",
+        cf_pakar: "",
+      });
+      setIsModalOpen(false);
+    } catch (error) {
+      alert("Error adding rule: " + error.message);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const jawaban = pertanyaanPelanggaran.map(pertanyaan => ({
+    const jawaban = pertanyaanPelanggaran.map((pertanyaan) => ({
       id: pertanyaan.id,
       pertanyaan: pertanyaan.label,
-      jawaban: jawabanLabelMap[formData[pertanyaan.id]] || '-'
+      jawaban: jawabanLabelMap[formData[pertanyaan.id]] || "-",
     }));
 
     setRingkasanJawaban({
@@ -187,14 +278,18 @@ export default function PrediksiPupuk() {
           Identifikasi Pelanggaran Lalu Lintas
         </h1>
         <p className="text-center text-gray-600 mb-6">
-          Silakan jawab pertanyaan berikut dengan memilih <strong>Ya</strong> atau <strong>Tidak</strong>
+          Silakan jawab pertanyaan berikut dengan memilih <strong>Ya</strong>{" "}
+          atau <strong>Tidak</strong>
         </p>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Data Pelanggar */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6 border-b border-gray-300">
             <div className="flex flex-col">
-              <label htmlFor="nama_pelanggar" className="text-sm font-semibold text-gray-700 mb-1">
+              <label
+                htmlFor="nama_pelanggar"
+                className="text-sm font-semibold text-gray-700 mb-1"
+              >
                 Nama Pelanggar
               </label>
               <input
@@ -209,7 +304,10 @@ export default function PrediksiPupuk() {
               />
             </div>
             <div className="flex flex-col">
-              <label htmlFor="alamat" className="text-sm font-semibold text-gray-700 mb-1">
+              <label
+                htmlFor="alamat"
+                className="text-sm font-semibold text-gray-700 mb-1"
+              >
                 Alamat
               </label>
               <input
@@ -239,8 +337,11 @@ export default function PrediksiPupuk() {
                   {index + 1}. {pertanyaan.label}
                 </label>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {opsiJawaban.map(opsi => (
-                    <label key={opsi.value} className="flex items-center cursor-pointer">
+                  {opsiJawaban.map((opsi) => (
+                    <label
+                      key={opsi.value}
+                      className="flex items-center cursor-pointer"
+                    >
                       <input
                         type="radio"
                         name={pertanyaan.id}
@@ -250,7 +351,9 @@ export default function PrediksiPupuk() {
                         className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
                         required
                       />
-                      <span className="ml-2 text-base text-gray-700 font-medium">{opsi.label}</span>
+                      <span className="ml-2 text-base text-gray-700 font-medium">
+                        {opsi.label}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -266,19 +369,146 @@ export default function PrediksiPupuk() {
           </button>
         </form>
 
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg mt-4 transition-colors"
+        >
+          Create New Rule
+        </button>
+
+        {/* Modal for creating new rule */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
+            <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-auto">
+              <h2 className="text-xl font-bold mb-4">Create New Rule</h2>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCreateRule();
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label
+                    htmlFor="kode_rule"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Kode Rule
+                  </label>
+                  <input
+                    type="text"
+                    name="kode_rule"
+                    id="kode_rule"
+                    value={newRuleData.kode_rule}
+                    onChange={handleModalChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="deskripsi"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Deskripsi
+                  </label>
+                  <textarea
+                    name="deskripsi"
+                    id="deskripsi"
+                    value={newRuleData.deskripsi}
+                    onChange={handleModalChange}
+                    rows="3"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  ></textarea>
+                </div>
+                <div>
+                  <label
+                    htmlFor="pasal"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Pasal
+                  </label>
+                  <input
+                    type="text"
+                    name="pasal"
+                    id="pasal"
+                    value={newRuleData.pasal}
+                    onChange={handleModalChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="denda"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Denda
+                  </label>
+                  <input
+                    type="text"
+                    name="denda"
+                    id="denda"
+                    value={newRuleData.denda}
+                    onChange={handleModalChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="cf_pakar"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    CF Pakar
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    name="cf_pakar"
+                    id="cf_pakar"
+                    value={newRuleData.cf_pakar}
+                    onChange={handleModalChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  />
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Create
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {ringkasanJawaban && (
           <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-6 space-y-4">
             <div>
-              <h3 className="text-xl font-semibold text-gray-800">Ringkasan Jawaban</h3>
+              <h3 className="text-xl font-semibold text-gray-800">
+                Ringkasan Jawaban
+              </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base text-gray-700">
               <div>
                 <span className="font-semibold">Nama Pelanggar</span>
-                <p className="mt-1">{ringkasanJawaban.nama || '-'}</p>
+                <p className="mt-1">{ringkasanJawaban.nama || "-"}</p>
               </div>
               <div>
                 <span className="font-semibold">Alamat</span>
-                <p className="mt-1">{ringkasanJawaban.alamat || '-'}</p>
+                <p className="mt-1">{ringkasanJawaban.alamat || "-"}</p>
               </div>
             </div>
             <div className="space-y-3">
@@ -290,7 +520,9 @@ export default function PrediksiPupuk() {
                   <p className="font-semibold text-gray-800">
                     {idx + 1}. {item.pertanyaan}
                   </p>
-                  <p className="mt-1 text-blue-700 font-medium">{item.jawaban}</p>
+                  <p className="mt-1 text-blue-700 font-medium">
+                    {item.jawaban}
+                  </p>
                 </div>
               ))}
             </div>
@@ -304,41 +536,60 @@ export default function PrediksiPupuk() {
               marginTop: 32,
               borderRadius: 12,
               padding: 24,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               fontSize: 15,
-              border: `2px solid ${hasilPrediksi.hasil === 'Layak' ? '#6ee7b7' : '#fca5a5'}`,
-              backgroundColor: hasilPrediksi.hasil === 'Layak' ? '#d1fae5' : '#fee2e2',
-              color: '#374151',
-              fontFamily: 'Arial, sans-serif',
+              border: `2px solid ${
+                hasilPrediksi.hasil === "Layak" ? "#6ee7b7" : "#fca5a5"
+              }`,
+              backgroundColor:
+                hasilPrediksi.hasil === "Layak" ? "#d1fae5" : "#fee2e2",
+              color: "#374151",
+              fontFamily: "Arial, sans-serif",
               fontWeight: 500,
               maxWidth: 700,
-              marginLeft: 'auto',
-              marginRight: 'auto',
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
-            <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 24, marginBottom: 8 }}>
+            <div
+              style={{
+                textAlign: "center",
+                fontWeight: 700,
+                fontSize: 24,
+                marginBottom: 8,
+              }}
+            >
               Keterangan Hasil Penentuan Pupuk Organik
             </div>
             <div
               style={{
-                textAlign: 'center',
+                textAlign: "center",
                 fontWeight: 700,
                 fontSize: 20,
-                color: hasilPrediksi.hasil === 'Layak' ? '#065f46' : '#991b1b',
-                backgroundColor: hasilPrediksi.hasil === 'Layak' ? '#bbf7d0' : '#fecaca',
+                color: hasilPrediksi.hasil === "Layak" ? "#065f46" : "#991b1b",
+                backgroundColor:
+                  hasilPrediksi.hasil === "Layak" ? "#bbf7d0" : "#fecaca",
                 borderRadius: 8,
                 padding: 12,
                 marginBottom: 20,
-                display: 'inline-block',
+                display: "inline-block",
                 minWidth: 180,
               }}
             >
               Hasil: {hasilPrediksi.hasil}
             </div>
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16 }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginBottom: 16,
+              }}
+            >
               <tbody>
                 <tr>
-                  <td style={{ fontWeight: 700, padding: 8, width: '40%' }}>Kelompok Tani</td>
+                  <td style={{ fontWeight: 700, padding: 8, width: "40%" }}>
+                    Kelompok Tani
+                  </td>
                   <td style={{ padding: 8 }}>{formData.kelompok_tani}</td>
                 </tr>
                 <tr>
@@ -347,31 +598,81 @@ export default function PrediksiPupuk() {
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 700, padding: 8 }}>Luas Lahan</td>
-                  <td style={{ padding: 8 }}>{['< 0.5 hektar', '0.5 - 1 hektar', '> 1 hektar'][formData.luas_lahan-1]}</td>
+                  <td style={{ padding: 8 }}>
+                    {
+                      ["< 0.5 hektar", "0.5 - 1 hektar", "> 1 hektar"][
+                        formData.luas_lahan - 1
+                      ]
+                    }
+                  </td>
                 </tr>
                 <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>Jumlah Anggota Tani</td>
-                  <td style={{ padding: 8 }}>{['< 10', '10 - 20', '> 20'][formData.anggota_tani-1]}</td>
+                  <td style={{ fontWeight: 700, padding: 8 }}>
+                    Jumlah Anggota Tani
+                  </td>
+                  <td style={{ padding: 8 }}>
+                    {["< 10", "10 - 20", "> 20"][formData.anggota_tani - 1]}
+                  </td>
                 </tr>
                 <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>Produksi Panen</td>
-                  <td style={{ padding: 8 }}>{['< 1 ton', '1 - 2 ton', '> 2 ton'][formData.hasil_panen-1]}</td>
+                  <td style={{ fontWeight: 700, padding: 8 }}>
+                    Produksi Panen
+                  </td>
+                  <td style={{ padding: 8 }}>
+                    {
+                      ["< 1 ton", "1 - 2 ton", "> 2 ton"][
+                        formData.hasil_panen - 1
+                      ]
+                    }
+                  </td>
                 </tr>
                 <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>Pemanfaatan Bantuan</td>
-                  <td style={{ padding: 8 }}>{['Pernah (tidak tepat guna)', 'Pernah (tepat guna)', 'Tidak pernah'][formData.pemanfaatan-1]}</td>
+                  <td style={{ fontWeight: 700, padding: 8 }}>
+                    Pemanfaatan Bantuan
+                  </td>
+                  <td style={{ padding: 8 }}>
+                    {
+                      [
+                        "Pernah (tidak tepat guna)",
+                        "Pernah (tepat guna)",
+                        "Tidak pernah",
+                      ][formData.pemanfaatan - 1]
+                    }
+                  </td>
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 700, padding: 8 }}>Status Lahan</td>
-                  <td style={{ padding: 8 }}>{['Milik sendiri', 'Sewa', 'Bagi hasil'][formData.status_lahan-1]}</td>
+                  <td style={{ padding: 8 }}>
+                    {
+                      ["Milik sendiri", "Sewa", "Bagi hasil"][
+                        formData.status_lahan - 1
+                      ]
+                    }
+                  </td>
                 </tr>
                 <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>Pendapatan Musim</td>
-                  <td style={{ padding: 8 }}>{['> 5 juta', '2 - 5 juta', '< 2 juta'][formData.pendapatan-1]}</td>
+                  <td style={{ fontWeight: 700, padding: 8 }}>
+                    Pendapatan Musim
+                  </td>
+                  <td style={{ padding: 8 }}>
+                    {
+                      ["> 5 juta", "2 - 5 juta", "< 2 juta"][
+                        formData.pendapatan - 1
+                      ]
+                    }
+                  </td>
                 </tr>
                 <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>Rekomendasi Penyuluh</td>
-                  <td style={{ padding: 8 }}>{['Tidak direkomendasikan', 'Direkomendasikan'][formData.rekomendasi-1]}</td>
+                  <td style={{ fontWeight: 700, padding: 8 }}>
+                    Rekomendasi Penyuluh
+                  </td>
+                  <td style={{ padding: 8 }}>
+                    {
+                      ["Tidak direkomendasikan", "Direkomendasikan"][
+                        formData.rekomendasi - 1
+                      ]
+                    }
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -380,15 +681,15 @@ export default function PrediksiPupuk() {
               onClick={handleExportPDF}
               style={{
                 marginTop: 12,
-                width: '100%',
-                backgroundColor: '#2563eb',
-                color: '#fff',
+                width: "100%",
+                backgroundColor: "#2563eb",
+                color: "#fff",
                 fontWeight: 700,
-                padding: '10px 0',
-                border: 'none',
+                padding: "10px 0",
+                border: "none",
                 borderRadius: 8,
                 fontSize: 16,
-                cursor: 'pointer',
+                cursor: "pointer",
               }}
             >
               Unduh PDF

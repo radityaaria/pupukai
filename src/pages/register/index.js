@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-// import client from "../../../libs/axios";
+import { supabase } from "../../../libs/supabaseClient";
 
 const Register = () => {
   const [nama, setNama] = useState("");
@@ -10,31 +10,34 @@ const Register = () => {
   const [alamat, setAlamat] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user"); // Set default role to "user"
 
   const router = useRouter(); // Inisialisasi useRouter
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-console.log("data");
-    // try {
-    //   const response = await client.post("/auth/register", {
-    //     firstName: nama,
-    //     umur,
-    //     pekerjaan,
-    //     alamat,
-    //     email,
-    //     password,
-    //   });
+    try {
+      const { data, error } = await supabase.from("users").insert([
+        {
+          nama: nama,
+          umur: umur,
+          pekerjaan: pekerjaan,
+          alamat: alamat,
+          email: email,
+          password: password, // In a real application, you should hash the password before sending it to the database
+          role: role,
+        },
+      ]);
 
-    //   if (response.status === 200) {
-    //     localStorage.setItem("token", response.data.token);
-    //     router.push("/simulasi");
-    //   } else {
-    //     alert("Pendaftaran gagal!");
-    //   }
-    // } catch (error) {
-    //   alert("Terjadi kesalahan saat pendaftaran!");
-    // }
+      if (error) {
+        throw error;
+      }
+
+      alert("Pendaftaran berhasil!");
+      router.push("/pelanggaran"); // Redirect to home page after successful registration
+    } catch (error) {
+      alert("Terjadi kesalahan saat pendaftaran: " + error.message);
+    }
   };
 
   return (
@@ -141,7 +144,10 @@ console.log("data");
         </button>
         <p className="text-center mt-4 text-gray-600">
           Sudah punya akun?{" "}
-          <Link href="/login" className="text-blue-500 hover:text-blue-700 hover:underline font-semibold">
+          <Link
+            href="/login"
+            className="text-blue-500 hover:text-blue-700 hover:underline font-semibold"
+          >
             Silahkan login
           </Link>
         </p>
