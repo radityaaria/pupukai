@@ -195,6 +195,7 @@ export default function PrediksiPupuk() {
       return acc;
     }, {}),
   });
+  const [showQuestionnaire, setShowQuestionnaire] = useState(true); // Default to showing questionnaire
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newRuleData, setNewRuleData] = useState({
     kode_rule: "",
@@ -291,6 +292,7 @@ export default function PrediksiPupuk() {
     // ]);
 
     console.log("hasil:", hasil);
+    setShowQuestionnaire(false);
   };
 
   return (
@@ -299,99 +301,106 @@ export default function PrediksiPupuk() {
         <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">
           Identifikasi Pelanggaran Lalu Lintas
         </h1>
-        <p className="text-center text-gray-600 mb-6">
-          Silakan jawab pertanyaan berikut dengan memilih <strong>Ya</strong>{" "}
-          atau <strong>Tidak</strong>
+        <p className="text-lg text-gray-700 mb-8 text-center leading-relaxed">
+          {showQuestionnaire && (
+            <>
+              Silakan jawab pertanyaan berikut dengan memilih{" "}
+              <strong>Ya</strong> atau <strong>Tidak</strong>
+            </>
+          )}
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Data Pelanggar */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6 border-b border-gray-300">
-            <div className="flex flex-col">
-              <label
-                htmlFor="nama_pelanggar"
-                className="text-sm font-semibold text-gray-700 mb-1"
-              >
-                Nama Pelanggar
-              </label>
-              <input
-                type="text"
-                name="nama_pelanggar"
-                id="nama_pelanggar"
-                value={formData.nama_pelanggar}
-                onChange={handleChange}
-                className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-                placeholder="Nama lengkap"
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label
-                htmlFor="alamat"
-                className="text-sm font-semibold text-gray-700 mb-1"
-              >
-                Alamat
-              </label>
-              <input
-                type="text"
-                name="alamat"
-                id="alamat"
-                value={formData.alamat}
-                onChange={handleChange}
-                className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-                placeholder="Alamat lengkap"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Kuesioner */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Pertanyaan Pelanggaran
-            </h2>
-            {pertanyaanPelanggaran.map((pertanyaan, index) => (
-              <div
-                key={pertanyaan.id}
-                className="bg-gray-50 p-4 rounded-lg border border-gray-200"
-              >
-                <label className="block text-base font-semibold text-gray-700 mb-3">
-                  {index + 1}. {pertanyaan.label}
+        {showQuestionnaire && (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Data Pelanggar */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6 border-b border-gray-300">
+              <div className="flex flex-col">
+                <label
+                  htmlFor="nama_pelanggar"
+                  className="text-sm font-semibold text-gray-700 mb-1"
+                >
+                  Nama Pelanggar
                 </label>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {opsiJawaban.map((opsi) => (
-                    <label
-                      key={opsi.value}
-                      className="flex items-center cursor-pointer"
-                    >
-                      <input
-                        type="radio"
-                        name={pertanyaan.id}
-                        value={opsi.value}
-                        checked={formData[pertanyaan.id] === opsi.value}
-                        onChange={handleChange}
-                        className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
-                        required
-                      />
-                      <span className="ml-2 text-base text-gray-700 font-medium">
-                        {opsi.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
+                <input
+                  type="text"
+                  name="nama_pelanggar"
+                  id="nama_pelanggar"
+                  value={formData.nama_pelanggar}
+                  onChange={handleChange}
+                  className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                  placeholder="Nama lengkap"
+                  required
+                />
               </div>
-            ))}
-          </div>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="alamat"
+                  className="text-sm font-semibold text-gray-700 mb-1"
+                >
+                  Alamat
+                </label>
+                <input
+                  type="text"
+                  name="alamat"
+                  id="alamat"
+                  value={formData.alamat}
+                  onChange={handleChange}
+                  className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                  placeholder="Alamat lengkap"
+                  required
+                />
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg mt-6 transition-colors"
-          >
-            Analisis Pelanggaran
-          </button>
-        </form>
+            {/* Kuesioner */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Pertanyaan Pelanggaran
+              </h2>
+              {pertanyaanPelanggaran.map((pertanyaan, index) => (
+                <div
+                  key={pertanyaan.id}
+                  className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                >
+                  <label className="block text-base font-semibold text-gray-700 mb-3">
+                    {index + 1}. {pertanyaan.label}
+                  </label>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {opsiJawaban.map((opsi) => (
+                      <label
+                        key={opsi.value}
+                        className="flex items-center cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name={pertanyaan.id}
+                          value={opsi.value}
+                          checked={formData[pertanyaan.id] === opsi.value}
+                          onChange={handleChange}
+                          className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                          required
+                        />
+                        <span className="ml-2 text-base text-gray-700 font-medium">
+                          {opsi.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-        {ringkasanJawaban && (
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg mt-6 transition-colors"
+            >
+              Analisis Pelanggaran
+            </button>
+          </form>
+        )}
+
+        {/* Output Section */}
+        {!showQuestionnaire && ringkasanJawaban && (
           <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-6 space-y-4">
             <div>
               <h3 className="text-xl font-semibold text-gray-800">
