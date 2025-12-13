@@ -14,8 +14,10 @@ const rulebaseLabelMap = {
 const riwayatLabelMap = {
   id_riwayat: "ID Riwayat",
   nama_pelanggar: "Nama Pelanggar",
-  alamat_pelanggar: "Alamat Pelanggar",
+  alamat: "Alamat",
   detail_jawaban: "Detail Jawaban",
+  hasil_pelanggaran: "Hasil Pelanggaran",
+  total_denda_maks: "Total Denda Max",
   created_at: "Waktu Identifikasi",
 };
 
@@ -32,6 +34,48 @@ const valueMap = {
   pendapatan: ["> 5 juta", "2 - 5 juta", "< 2 juta"],
   rekomendasi: ["Tidak direkomendasikan", "Direkomendasikan"],
 };
+
+const formatDetailJawaban = (detailJawaban) => {
+  if (!detailJawaban || detailJawaban.length === 0) return "-";
+  return (
+    <ul className="list-inside text-left">
+      {detailJawaban.map((item, idx) => (
+        <li key={idx}>
+          {idx + 1}. {item.pertanyaan}: {item.jawaban} (CF: {item.cf_user})
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+const formatHasilPelanggaran = (hasilPelanggaran) => {
+  if (!hasilPelanggaran || hasilPelanggaran.length === 0)
+    return "Tidak ada pelanggaran teridentifikasi.";
+  return (
+    <ol className="list-inside text-left">
+      {hasilPelanggaran.map((h, idx) => (
+        <li key={idx}>
+          {idx + 1}. Pasal {h.pasal} ({h.keterangan}), CF Hasil: {h.cf_hasil},
+          Denda:{" "}
+          {new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+          }).format(h.denda_maks)}
+        </li>
+      ))}
+    </ol>
+  );
+};
+
+const formatRupiah = (angka) => {
+  const number = parseInt(angka);
+  if (isNaN(number)) return "0";
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+  }).format(number);
+};
+
 const Dashboard = () => {
   const [tab, setTab] = useState("rulebase");
   const [rulebase, setRulebase] = useState([]);
@@ -286,7 +330,11 @@ const Dashboard = () => {
             <FaSignOutAlt className="mr-2" /> Logout
           </button>
         </div>
-        <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-7xl">
+        <div
+          className={`bg-white p-8 rounded-xl shadow-md w-full ${
+            tab === "riwayat" ? "max-w-full" : "max-w-7xl"
+          }`}
+        >
           {tab === "rulebase" ? (
             <>
               <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">
@@ -396,11 +444,22 @@ const Dashboard = () => {
                               key !== "id_riwayat" &&
                               key !== "id_user"
                           )
-                          .map((key) => (
-                            <th key={key} className="p-2 border">
-                              {riwayatLabelMap[key] || key}
-                            </th>
-                          ))}
+                          .map((key) => {
+                            let widthClass = "";
+                            if (key === "detail_jawaban") {
+                              widthClass = "w-[40%]";
+                            } else if (key === "hasil_pelanggaran") {
+                              widthClass = "w-[25%]";
+                            }
+                            return (
+                              <th
+                                key={key}
+                                className={`p-2 border ${widthClass}`}
+                              >
+                                {riwayatLabelMap[key] || key}
+                              </th>
+                            );
+                          })}
                       </tr>
                     </thead>
                     <tbody>
@@ -418,25 +477,44 @@ const Dashboard = () => {
                                 key !== "id_riwayat" &&
                                 key !== "id_user"
                             )
-                            .map((key) => (
-                              <td key={key} className="p-2 border text-center">
-                                {key === "detail_jawaban"
-                                  ? JSON.stringify(riwayat[key])
-                                  : key === "created_at"
-                                  ? new Date(riwayat[key]).toLocaleString(
-                                      "id-ID",
-                                      {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                        second: "2-digit",
-                                      }
-                                    )
-                                  : riwayat[key]}
-                              </td>
-                            ))}
+                            .map((key) => {
+                              let widthClass = "";
+                              if (key === "detail_jawaban") {
+                                widthClass = "w-[40%]";
+                              } else if (key === "hasil_pelanggaran") {
+                                widthClass = "w-[25%]";
+                              }
+                              return (
+                                <td
+                                  key={key}
+                                  className={`p-2 border ${widthClass} ${
+                                    key === "detail_jawaban"
+                                      ? "text-left"
+                                      : "text-center"
+                                  }`}
+                                >
+                                  {key === "detail_jawaban"
+                                    ? formatDetailJawaban(riwayat[key])
+                                    : key === "hasil_pelanggaran"
+                                    ? formatHasilPelanggaran(riwayat[key])
+                                    : key === "total_denda_maks"
+                                    ? formatRupiah(riwayat[key])
+                                    : key === "created_at"
+                                    ? new Date(riwayat[key]).toLocaleString(
+                                        "id-ID",
+                                        {
+                                          year: "numeric",
+                                          month: "long",
+                                          day: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          second: "2-digit",
+                                        }
+                                      )
+                                    : riwayat[key]}
+                                </td>
+                              );
+                            })}
                         </tr>
                       ))}
                     </tbody>

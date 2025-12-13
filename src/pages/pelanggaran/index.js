@@ -281,15 +281,23 @@ export default function PrediksiPupuk() {
     setTotalDendaMaks(total);
 
     // 4) (opsional) simpan riwayat ke Supabase
-    // NOTE: sesuaikan kolom tabel identifikasi kamu
-    // await supabase.from("identifikasi").insert([
-    //   {
-    //     nama_pelanggar: formData.nama_pelanggar,
-    //     alamat: formData.alamat,
-    //     hasil_json: hasil, // kalau kolom jsonb
-    //     total_denda: total,
-    //   },
-    // ]);
+    const { data: riwayatData, error: riwayatError } = await supabase
+      .from("riwayat")
+      .insert([
+        {
+          id_user: (await supabase.auth.getUser()).data.user.id,
+          nama_pelanggar: formData.nama_pelanggar,
+          alamat: formData.alamat,
+          detail_jawaban: jawaban, // store the array of answers with CF_user
+          hasil_pelanggaran: hasil, // store the array of rule analysis results
+          total_denda_maks: total,
+        },
+      ]);
+
+    if (riwayatError) {
+      console.error("Error saving riwayat:", riwayatError);
+      alert("Gagal menyimpan riwayat identifikasi.");
+    }
 
     console.log("hasil:", hasil);
     setShowQuestionnaire(false);
