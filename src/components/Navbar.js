@@ -10,7 +10,6 @@ const Navbar = () => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      router.push("/dashboard");
     } else {
       setIsLoggedIn(false);
     }
