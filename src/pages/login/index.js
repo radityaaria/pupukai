@@ -20,7 +20,33 @@ const Login = () => {
         alert("Email atau password salah!");
       } else {
         localStorage.setItem("token", response.data.session.access_token);
-        router.push("/dashboard");
+
+        const { user } = response.data.session;
+
+        if (user) {
+          const { data: userData, error: userError } = await supabase
+            .from("users")
+            .select("role")
+            .eq("id_user", user.id)
+            .single();
+
+          if (userError) {
+            console.error("Error fetching user role:", userError);
+            alert("Gagal mendapatkan peran pengguna.");
+            return;
+          }
+
+          if (userData && userData.role === "admin") {
+            router.push("/dashboard");
+          } else if (userData && userData.role === "user") {
+            router.push("/pelanggaran");
+          } else {
+            // Default redirection if role is not 'admin' or 'user'
+            router.push("/pelanggaran");
+          }
+        } else {
+          alert("Data pengguna tidak ditemukan setelah login.");
+        }
       }
     } catch (error) {
       alert("Email atau password salah!");

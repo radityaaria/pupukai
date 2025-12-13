@@ -1,29 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
+import { FaTrash, FaEdit, FaPlus, FaSignOutAlt } from "react-icons/fa";
 import { supabase } from "~/libs/supabaseClient";
+import { useRouter } from "next/router";
 
-const labelMap = {
-  kelompokTani: "Kelompok Tani",
-  alamat: "Alamat",
-  luasLahan: "Luas Lahan",
-  jumlahAnggotaTani: "Jumlah Anggota Tani",
-  produksiPanen: "Produksi Panen",
-  pemanfaatanBantuan: "Pemanfaatan Bantuan",
-  statusLahan: "Status Lahan",
-  pendapatan: "Pendapatan Musim",
-  rekomendasi: "Rekomendasi Penyuluh",
-  kelas: "Hasil Prediksi",
-  createdAt: "Waktu Prediksi",
-  if_luasLahan: "Jika Luas Lahan",
-  if_jumlahAnggotaTani: "Jika Jumlah Anggota Tani",
-  if_produksiPanen: "Jika Produksi Panen",
-  if_pemanfaatanBantuan: "Jika Pemanfaatan Bantuan",
-  if_statusLahan: "Jika Status Lahan",
-  if_pendapatan: "Jika Pendapatan Musim",
-  if_rekomendasi: "Jika Rekomendasi Penyuluh",
-  then_kelas: "Maka Hasil Prediksi",
+const rulebaseLabelMap = {
   kode_rule: "Kode Rule",
+  deskripsi: "Deskripsi",
+  pasal: "Pasal",
+  denda: "Denda",
   cf_pakar: "Cf Pakar",
+};
+
+const riwayatLabelMap = {
+  id_riwayat: "ID Riwayat",
+  nama_pelanggar: "Nama Pelanggar",
+  alamat_pelanggar: "Alamat Pelanggar",
+  detail_jawaban: "Detail Jawaban",
+  created_at: "Waktu Identifikasi",
 };
 
 const valueMap = {
@@ -39,12 +32,14 @@ const valueMap = {
   pendapatan: ["> 5 juta", "2 - 5 juta", "< 2 juta"],
   rekomendasi: ["Tidak direkomendasikan", "Direkomendasikan"],
 };
-
 const Dashboard = () => {
   const [tab, setTab] = useState("rulebase");
   const [rulebase, setRulebase] = useState([]);
   const [loadingRulebase, setLoadingRulebase] = useState(false);
   const [errorRulebase, setErrorRulebase] = useState(null);
+  const [riwayatData, setRiwayatData] = useState([]);
+  const [loadingRiwayat, setLoadingRiwayat] = useState(false);
+  const [errorRiwayat, setErrorRiwayat] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const [newRuleData, setNewRuleData] = useState({
     // State for new rule form data
@@ -54,6 +49,7 @@ const Dashboard = () => {
     denda: "",
     cf_pakar: "",
   });
+  const router = useRouter();
 
   useEffect(() => {
     if (tab === "rulebase" && rulebase.length === 0 && !loadingRulebase) {
@@ -77,6 +73,28 @@ const Dashboard = () => {
         });
     }
   }, [tab]);
+
+  useEffect(() => {
+    if (tab === "riwayat" && riwayatData.length === 0 && !loadingRiwayat) {
+      setLoadingRiwayat(true);
+      supabase
+        .from("riwayat")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .then(({ data, error }) => {
+          if (error) {
+            throw error;
+          }
+          setRiwayatData(data);
+          setLoadingRiwayat(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching riwayat:", err);
+          setErrorRiwayat("Gagal mengambil data riwayat");
+          setLoadingRiwayat(false);
+        });
+    }
+  }, [tab, riwayatData.length, loadingRiwayat]);
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
@@ -214,6 +232,17 @@ const Dashboard = () => {
     setIsModalOpen(true);
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      localStorage.removeItem("token"); // Clear any stored tokens
+      router.push("/");
+    } catch (error) {
+      console.error("Error logging out:", error.message);
+      alert("Failed to log out.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-200">
       <div className="sticky top-0 z-10 bg-slate-200 py-4">
@@ -228,89 +257,194 @@ const Dashboard = () => {
           >
             Rulebase
           </button>
+          <button
+            className={`px-4 py-2 rounded-t-lg font-semibold border-b-2 ${
+              tab === "riwayat"
+                ? "border-blue-600 text-blue-700 bg-blue-100"
+                : "border-transparent text-gray-500 bg-gray-100"
+            }`}
+            onClick={() => setTab("riwayat")}
+          >
+            Riwayat
+          </button>
         </div>
       </div>
       <div className="p-10 flex flex-col items-center justify-center">
         <div className="flex gap-4 justify-center mt-4">
+          {tab === "rulebase" && (
+            <button
+              onClick={handleCreate}
+              className="mt-2 mb-4 bg-green-600 text-white rounded hover:bg-green-800 flex items-center p-2"
+            >
+              <FaPlus className="mr-2" /> Create
+            </button>
+          )}
           <button
-            onClick={handleCreate}
-            className="mt-2 mb-4 bg-green-600 text-white rounded hover:bg-green-800 flex items-center p-2"
+            onClick={handleLogout}
+            className="mt-2 mb-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 font-semibold flex items-center"
           >
-            <FaPlus className="mr-2" /> Create
+            <FaSignOutAlt className="mr-2" /> Logout
           </button>
         </div>
         <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-7xl">
-          <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">
-            Rule Base Tilang Expert
-          </h1>
-          <div className="overflow-x-auto">
-            {loadingRulebase ? (
-              <div className="text-center text-gray-500 py-8">
-                Memuat data rulebase...
-              </div>
-            ) : errorRulebase ? (
-              <div className="text-center text-red-500 py-8">
-                {errorRulebase}
-              </div>
-            ) : rulebase.length === 0 ? (
-              <div className="text-center text-gray-500">
-                Belum ada data rulebase.
-              </div>
-            ) : (
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="bg-slate-100">
-                    <th className="p-2 border">No</th>
-                    {Object.keys(rulebase[0])
-                      .filter(
-                        (key) =>
-                          key !== "__v" && key !== "_id" && key !== "id_rule"
-                      )
-                      .map((key) => (
-                        <th key={key} className="p-2 border">
-                          {labelMap[key] || key}
-                        </th>
-                      ))}
-                    <th className="p-2 border">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rulebase.map((rule, idx) => (
-                    <tr key={rule.id} className="even:bg-slate-50">
-                      <td className="p-2 border text-center">{idx + 1}</td>
-                      {Object.keys(rule)
-                        .filter(
-                          (key) =>
-                            key !== "__v" && key !== "_id" && key !== "id_rule"
-                        )
-                        .map((key) => (
-                          <td key={key} className="p-2 border text-center">
-                            {valueMap[key]
-                              ? valueMap[key][parseInt(rule[key]) - 1] ||
-                                rule[key]
-                              : rule[key]}
+          {tab === "rulebase" ? (
+            <>
+              <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">
+                Rule Base Tilang Expert
+              </h1>
+              <div className="overflow-x-auto">
+                {loadingRulebase ? (
+                  <div className="text-center text-gray-500 py-8">
+                    Memuat data rulebase...
+                  </div>
+                ) : errorRulebase ? (
+                  <div className="text-center text-red-500 py-8">
+                    {errorRulebase}
+                  </div>
+                ) : rulebase.length === 0 ? (
+                  <div className="text-center text-gray-500">
+                    Belum ada data rulebase.
+                  </div>
+                ) : (
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-slate-100">
+                        <th className="p-2 border">No</th>
+                        {Object.keys(rulebase[0])
+                          .filter(
+                            (key) =>
+                              key !== "__v" &&
+                              key !== "_id" &&
+                              key !== "id_rule"
+                          )
+                          .map((key) => (
+                            <th key={key} className="p-2 border">
+                              {rulebaseLabelMap[key] || key}
+                            </th>
+                          ))}
+                        <th className="p-2 border">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rulebase.map((rule, idx) => (
+                        <tr key={rule.id} className="even:bg-slate-50">
+                          <td className="p-2 border text-center">{idx + 1}</td>
+                          {Object.keys(rule)
+                            .filter(
+                              (key) =>
+                                key !== "__v" &&
+                                key !== "_id" &&
+                                key !== "id_rule"
+                            )
+                            .map((key) => (
+                              <td key={key} className="p-2 border text-center">
+                                {valueMap[key]
+                                  ? valueMap[key][parseInt(rule[key]) - 1] ||
+                                    rule[key]
+                                  : rule[key]}
+                              </td>
+                            ))}
+                          <td className="border p-1 flex items-center mt-5 justify-center gap-3">
+                            <button
+                              onClick={() => handleEdit(rule)}
+                              className="text-yellow-500 hover:text-yellow-700"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(rule.id_rule)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <FaTrash />
+                            </button>
                           </td>
-                        ))}
-                      <td className="border p-1 flex items-center mt-5 justify-center gap-3">
-                        <button
-                          onClick={() => handleEdit(rule)}
-                          className="text-yellow-500 hover:text-yellow-700"
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </>
+          ) : tab === "riwayat" ? (
+            <>
+              <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">
+                Riwayat Identifikasi Pelanggaran
+              </h1>
+              <div className="overflow-x-auto">
+                {loadingRiwayat ? (
+                  <div className="text-center text-gray-500 py-8">
+                    Memuat data riwayat...
+                  </div>
+                ) : errorRiwayat ? (
+                  <div className="text-center text-red-500 py-8">
+                    {errorRiwayat}
+                  </div>
+                ) : riwayatData.length === 0 ? (
+                  <div className="text-center text-gray-500">
+                    Belum ada data riwayat.
+                  </div>
+                ) : (
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-slate-100">
+                        <th className="p-2 border">No</th>
+                        {Object.keys(riwayatData[0])
+                          .filter(
+                            (key) =>
+                              key !== "__v" &&
+                              key !== "_id" &&
+                              key !== "id_riwayat" &&
+                              key !== "id_user"
+                          )
+                          .map((key) => (
+                            <th key={key} className="p-2 border">
+                              {riwayatLabelMap[key] || key}
+                            </th>
+                          ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {riwayatData.map((riwayat, idx) => (
+                        <tr
+                          key={riwayat.id_riwayat}
+                          className="even:bg-slate-50"
                         >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(rule.id_rule)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                          <td className="p-2 border text-center">{idx + 1}</td>
+                          {Object.keys(riwayat)
+                            .filter(
+                              (key) =>
+                                key !== "__v" &&
+                                key !== "_id" &&
+                                key !== "id_riwayat" &&
+                                key !== "id_user"
+                            )
+                            .map((key) => (
+                              <td key={key} className="p-2 border text-center">
+                                {key === "detail_jawaban"
+                                  ? JSON.stringify(riwayat[key])
+                                  : key === "created_at"
+                                  ? new Date(riwayat[key]).toLocaleString(
+                                      "id-ID",
+                                      {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        second: "2-digit",
+                                      }
+                                    )
+                                  : riwayat[key]}
+                              </td>
+                            ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
 

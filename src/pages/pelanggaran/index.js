@@ -1,98 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import axios from "axios";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "../../../libs/supabaseClient";
-
-const bobotKriteria = {
-  luas_lahan: 5,
-  anggota_tani: 2,
-  hasil_panen: 3,
-  pemanfaatan: 4,
-  status_lahan: 3,
-  pendapatan: 3,
-  rekomendasi: 2,
-};
-
-const dataset = [
-  {
-    luas_lahan: 3,
-    anggota_tani: 2,
-    hasil_panen: 3,
-    pemanfaatan: 3,
-    status_lahan: 3,
-    pendapatan: 3,
-    rekomendasi: 2,
-    kelas: "Layak",
-  },
-  {
-    luas_lahan: 1,
-    anggota_tani: 1,
-    hasil_panen: 1,
-    pemanfaatan: 3,
-    status_lahan: 2,
-    pendapatan: 1,
-    rekomendasi: 1,
-    kelas: "Tidak Layak",
-  },
-  {
-    luas_lahan: 3,
-    anggota_tani: 1,
-    hasil_panen: 3,
-    pemanfaatan: 1,
-    status_lahan: 1,
-    pendapatan: 1,
-    rekomendasi: 1,
-    kelas: "Tidak Layak",
-  },
-  {
-    luas_lahan: 3,
-    anggota_tani: 2,
-    hasil_panen: 2,
-    pemanfaatan: 2,
-    status_lahan: 2,
-    pendapatan: 2,
-    rekomendasi: 2,
-    kelas: "Layak",
-  },
-  {
-    luas_lahan: 2,
-    anggota_tani: 2,
-    hasil_panen: 3,
-    pemanfaatan: 2,
-    status_lahan: 1,
-    pendapatan: 2,
-    rekomendasi: 2,
-    kelas: "Tidak Layak",
-  },
-];
-
-function hitungJarak(data1, data2) {
-  let jarak = 0;
-  for (let kriteria in bobotKriteria) {
-    const selisih = data1[kriteria] - data2[kriteria];
-    jarak += Math.pow(selisih, 2) * bobotKriteria[kriteria];
-  }
-  return Math.sqrt(jarak);
-}
-
-function prediksiKNN(inputData, k = 3) {
-  const jarakSemua = dataset.map((data) => {
-    return { jarak: hitungJarak(inputData, data), kelas: data.kelas };
-  });
-  jarakSemua.sort((a, b) => a.jarak - b.jarak);
-  const tetangga = jarakSemua.slice(0, k);
-  const count = {};
-  tetangga.forEach((t) => {
-    count[t.kelas] = (count[t.kelas] || 0) + 1;
-  });
-  return {
-    hasil: Object.entries(count).sort((a, b) => b[1] - a[1])[0][0],
-    detail: tetangga,
-  };
-}
+import { useRouter } from "next/router";
 
 const pertanyaanPelanggaran = [
   {
@@ -174,6 +84,102 @@ const opsiJawaban = [
   { value: "pasti_ya", label: "Pasti ya" },
 ];
 
+const cfValueMap = {
+  pasti_ya: 1.0,
+  hampir_pasti_ya: 0.8,
+  kemungkinan_besar_ya: 0.6,
+  mungkin_ya: 0.4,
+  mungkin_tidak: 0.2,
+  tidak_tahu: 0.0,
+};
+
+const rules = [
+  {
+    ruleId: "R1",
+    pasal: "291 (1)",
+    denda: 250000,
+    cfPakar: 0.95,
+    gejala: ["tidak_memakai_helm_sni"],
+    op: "OR",
+    keterangan: "Tidak memakai helm standar SNI",
+  },
+  {
+    ruleId: "R2",
+    pasal: "287 (1–3)",
+    denda: 500000,
+    cfPakar: 0.9,
+    gejala: [
+      "melewati_lampu_merah",
+      "melebihi_batas_kecepatan_kota",
+      "parkir_di_tempat_terlarang",
+      "menghalangi_arus_lalu_lintas",
+    ],
+    op: "OR",
+    keterangan:
+      "Melewati lampu merah / melebihi kecepatan / parkir terlarang / menghalangi arus",
+  },
+  {
+    ruleId: "R3",
+    pasal: "283",
+    denda: 750000,
+    cfPakar: 0.85,
+    gejala: ["menggunakan_ponsel_saat_berkendara"],
+    op: "OR",
+    keterangan: "Menggunakan ponsel saat berkendara",
+  },
+  {
+    ruleId: "R4",
+    pasal: "311 (1)",
+    denda: 1000000,
+    cfPakar: 0.95,
+    gejala: ["mengemudi_dalam_pengaruh_alkohol"],
+    op: "OR",
+    keterangan: "Mengemudi dalam pengaruh alkohol tinggi",
+  },
+  {
+    ruleId: "R5",
+    pasal: "297",
+    denda: 3000000,
+    cfPakar: 0.9,
+    gejala: ["balapan_liar"],
+    op: "OR",
+    keterangan: "Balapan liar di jalan umum",
+  },
+  {
+    ruleId: "R6",
+    pasal: "307",
+    denda: 500000,
+    cfPakar: 0.85,
+    gejala: ["melebihi_kapasitas_muatan"],
+    op: "OR",
+    keterangan: "Muatan/penumpang melebihi kapasitas",
+  },
+  {
+    ruleId: "R7",
+    pasal: "285 (1–2)",
+    denda: 250000,
+    cfPakar: 0.85,
+    gejala: ["lampu_tidak_menyala_malam_hari", "kendaraan_tidak_layak_jalan"],
+    op: "OR",
+    keterangan: "Lampu tidak menyala / kendaraan tidak laik jalan",
+  },
+  {
+    ruleId: "R8",
+    pasal: "288 (1–2)",
+    denda: 500000,
+    cfPakar: 0.9,
+    gejala: ["tidak_bawa_atau_tidak_punya_sim", "tidak_membawa_stnk"],
+    op: "OR",
+    keterangan: "Tidak membawa SIM / STNK",
+  },
+];
+
+// helper format rupiah
+const formatRupiah = (n) =>
+  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(
+    Number(n || 0)
+  );
+
 const jawabanLabelMap = opsiJawaban.reduce((acc, opsi) => {
   acc[opsi.value] = opsi.label;
   return acc;
@@ -197,57 +203,37 @@ export default function PrediksiPupuk() {
     denda: "",
     cf_pakar: "",
   });
-  const [hasilPrediksi, setHasilPrediksi] = useState(null);
+
   const [ringkasanJawaban, setRingkasanJawaban] = useState(null);
-  const reportRef = useRef(null);
+  const router = useRouter();
+  const [hasilPelanggaran, setHasilPelanggaran] = useState([]); // hasil per pasal
+  const [totalDendaMaks, setTotalDendaMaks] = useState(0); // opsional total denda
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleModalChange = (e) => {
-    const { name, value } = e.target;
-    setNewRuleData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCreateRule = async () => {
-    try {
-      const { data, error } = await supabase.from("rulebase").insert([
-        {
-          kode_rule: newRuleData.kode_rule,
-          deskripsi: newRuleData.deskripsi,
-          pasal: newRuleData.pasal,
-          denda: parseInt(newRuleData.denda),
-          cf_pakar: parseFloat(newRuleData.cf_pakar),
-        },
-      ]);
-
-      if (error) {
-        throw error;
-      }
-
-      alert("Rule added successfully!");
-      setNewRuleData({
-        kode_rule: "",
-        deskripsi: "",
-        pasal: "",
-        denda: "",
-        cf_pakar: "",
-      });
-      setIsModalOpen(false);
-    } catch (error) {
-      alert("Error adding rule: " + error.message);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const jawaban = pertanyaanPelanggaran.map((pertanyaan) => ({
-      id: pertanyaan.id,
-      pertanyaan: pertanyaan.label,
-      jawaban: jawabanLabelMap[formData[pertanyaan.id]] || "-",
-    }));
+
+    // 1) ringkasan jawaban (tetap)
+    const jawaban = pertanyaanPelanggaran.map((pertanyaan) => {
+      const selectedValue = formData[pertanyaan.id];
+      return {
+        id: pertanyaan.id,
+        pertanyaan: pertanyaan.label,
+        jawaban: jawabanLabelMap[selectedValue] || "-",
+        cf_user: cfValueMap[selectedValue] ?? 0.0,
+      };
+    });
 
     setRingkasanJawaban({
       nama: formData.nama_pelanggar,
@@ -255,21 +241,57 @@ export default function PrediksiPupuk() {
       detailJawaban: jawaban,
     });
 
-    console.log("data");
-  };
+    // 2) hitung CF tiap rule (OR => ambil MAX)
+    const hasil = rules
+      .map((r) => {
+        const cfUserList = r.gejala.map((gid) => {
+          const selected = formData[gid];
+          return cfValueMap[selected] ?? 0.0;
+        });
 
-  // const handleExportPDF = async () => {
-  //   if (!reportRef.current) return;
-  //   const canvas = await html2canvas(reportRef.current);
-  //   const imgData = canvas.toDataURL('image/png');
-  //   const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
-  //   const pageWidth = pdf.internal.pageSize.getWidth();
-  //   const pageHeight = pdf.internal.pageSize.getHeight();
-  //   const imgWidth = pageWidth - 40;
-  //   const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  //   pdf.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight);
-  //   pdf.save('report-prediksi.pdf');
-  // };
+        const cfUserRule =
+          r.op === "OR"
+            ? Math.max(...cfUserList, 0)
+            : cfUserList.reduce((a, b) => a * b, 1);
+
+        const cfHasil = Number((cfUserRule * r.cfPakar).toFixed(3));
+
+        return {
+          ruleId: r.ruleId,
+          pasal: r.pasal,
+          keterangan: r.keterangan,
+          cf_pakar: r.cfPakar,
+          cf_user: Number(cfUserRule.toFixed(3)),
+          cf_hasil: cfHasil,
+          denda_maks: r.denda,
+          // dipakai untuk UI (mana gejala yang paling memicu)
+          gejalaTerpakai: r.gejala,
+        };
+      })
+      // tampilkan yang benar-benar "terjadi" saja
+      .filter((x) => x.cf_user > 0)
+      // urutkan dari CF terbesar
+      .sort((a, b) => b.cf_hasil - a.cf_hasil);
+
+    setHasilPelanggaran(hasil);
+
+    // 3) opsional total denda maksimal (kalau kamu mau dijumlahkan)
+    const total = hasil.reduce((sum, item) => sum + (item.denda_maks || 0), 0);
+    setTotalDendaMaks(total);
+
+    // 4) (opsional) simpan riwayat ke Supabase
+    // NOTE: sesuaikan kolom tabel identifikasi kamu
+    // await supabase.from("identifikasi").insert([
+    //   {
+    //     nama_pelanggar: formData.nama_pelanggar,
+    //     alamat: formData.alamat,
+    //     hasil_json: hasil, // kalau kolom jsonb
+    //     total_denda: total,
+    //   },
+    // ]);
+
+    console.log("hasil:", hasil);
+  };
 
   return (
     <main className="min-h-screen bg-slate-200 p-4 py-8">
@@ -369,131 +391,6 @@ export default function PrediksiPupuk() {
           </button>
         </form>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg mt-4 transition-colors"
-        >
-          Create New Rule
-        </button>
-
-        {/* Modal for creating new rule */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
-            <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-auto">
-              <h2 className="text-xl font-bold mb-4">Create New Rule</h2>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleCreateRule();
-                }}
-                className="space-y-4"
-              >
-                <div>
-                  <label
-                    htmlFor="kode_rule"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Kode Rule
-                  </label>
-                  <input
-                    type="text"
-                    name="kode_rule"
-                    id="kode_rule"
-                    value={newRuleData.kode_rule}
-                    onChange={handleModalChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="deskripsi"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Deskripsi
-                  </label>
-                  <textarea
-                    name="deskripsi"
-                    id="deskripsi"
-                    value={newRuleData.deskripsi}
-                    onChange={handleModalChange}
-                    rows="3"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    required
-                  ></textarea>
-                </div>
-                <div>
-                  <label
-                    htmlFor="pasal"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Pasal
-                  </label>
-                  <input
-                    type="text"
-                    name="pasal"
-                    id="pasal"
-                    value={newRuleData.pasal}
-                    onChange={handleModalChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="denda"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Denda
-                  </label>
-                  <input
-                    type="text"
-                    name="denda"
-                    id="denda"
-                    value={newRuleData.denda}
-                    onChange={handleModalChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="cf_pakar"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    CF Pakar
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="cf_pakar"
-                    id="cf_pakar"
-                    value={newRuleData.cf_pakar}
-                    onChange={handleModalChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    required
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    Create
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
         {ringkasanJawaban && (
           <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-6 space-y-4">
             <div>
@@ -529,171 +426,68 @@ export default function PrediksiPupuk() {
           </div>
         )}
 
-        {hasilPrediksi && (
-          <div
-            ref={reportRef}
-            style={{
-              marginTop: 32,
-              borderRadius: 12,
-              padding: 24,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-              fontSize: 15,
-              border: `2px solid ${
-                hasilPrediksi.hasil === "Layak" ? "#6ee7b7" : "#fca5a5"
-              }`,
-              backgroundColor:
-                hasilPrediksi.hasil === "Layak" ? "#d1fae5" : "#fee2e2",
-              color: "#374151",
-              fontFamily: "Arial, sans-serif",
-              fontWeight: 500,
-              maxWidth: 700,
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
-          >
-            <div
-              style={{
-                textAlign: "center",
-                fontWeight: 700,
-                fontSize: 24,
-                marginBottom: 8,
-              }}
-            >
-              Keterangan Hasil Penentuan Pupuk Organik
+        {hasilPelanggaran.length > 0 && (
+          <div className="mt-8 bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+            <h3 className="text-xl font-semibold text-gray-800">
+              Hasil Analisis (CF & Denda Maksimal)
+            </h3>
+
+            <div className="text-gray-700">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <span className="font-semibold">Nama:</span>{" "}
+                  {formData.nama_pelanggar}
+                </div>
+                <div>
+                  <span className="font-semibold">
+                    Total Denda Maksimal (opsional):
+                  </span>{" "}
+                  {formatRupiah(totalDendaMaks)}
+                </div>
+              </div>
             </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontWeight: 700,
-                fontSize: 20,
-                color: hasilPrediksi.hasil === "Layak" ? "#065f46" : "#991b1b",
-                backgroundColor:
-                  hasilPrediksi.hasil === "Layak" ? "#bbf7d0" : "#fecaca",
-                borderRadius: 8,
-                padding: 12,
-                marginBottom: 20,
-                display: "inline-block",
-                minWidth: 180,
-              }}
-            >
-              Hasil: {hasilPrediksi.hasil}
+
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-slate-100">
+                    <th className="p-2 border">No</th>
+                    <th className="p-2 border">Rule</th>
+                    <th className="p-2 border">Pasal</th>
+                    <th className="p-2 border">CF User</th>
+                    <th className="p-2 border">CF Pakar</th>
+                    <th className="p-2 border">CF Hasil</th>
+                    <th className="p-2 border">Denda Maks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {hasilPelanggaran.map((h, idx) => (
+                    <tr key={h.ruleId} className="even:bg-slate-50">
+                      <td className="p-2 border text-center">{idx + 1}</td>
+                      <td className="p-2 border text-center">{h.ruleId}</td>
+                      <td className="p-2 border">
+                        <div className="font-semibold">{h.pasal}</div>
+                        <div className="text-gray-600 text-xs">
+                          {h.keterangan}
+                        </div>
+                      </td>
+                      <td className="p-2 border text-center">{h.cf_user}</td>
+                      <td className="p-2 border text-center">{h.cf_pakar}</td>
+                      <td className="p-2 border text-center font-semibold text-blue-700">
+                        {h.cf_hasil}
+                      </td>
+                      <td className="p-2 border text-center font-semibold">
+                        {formatRupiah(h.denda_maks)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginBottom: 16,
-              }}
-            >
-              <tbody>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8, width: "40%" }}>
-                    Kelompok Tani
-                  </td>
-                  <td style={{ padding: 8 }}>{formData.kelompok_tani}</td>
-                </tr>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>Alamat</td>
-                  <td style={{ padding: 8 }}>{formData.alamat}</td>
-                </tr>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>Luas Lahan</td>
-                  <td style={{ padding: 8 }}>
-                    {
-                      ["< 0.5 hektar", "0.5 - 1 hektar", "> 1 hektar"][
-                        formData.luas_lahan - 1
-                      ]
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>
-                    Jumlah Anggota Tani
-                  </td>
-                  <td style={{ padding: 8 }}>
-                    {["< 10", "10 - 20", "> 20"][formData.anggota_tani - 1]}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>
-                    Produksi Panen
-                  </td>
-                  <td style={{ padding: 8 }}>
-                    {
-                      ["< 1 ton", "1 - 2 ton", "> 2 ton"][
-                        formData.hasil_panen - 1
-                      ]
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>
-                    Pemanfaatan Bantuan
-                  </td>
-                  <td style={{ padding: 8 }}>
-                    {
-                      [
-                        "Pernah (tidak tepat guna)",
-                        "Pernah (tepat guna)",
-                        "Tidak pernah",
-                      ][formData.pemanfaatan - 1]
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>Status Lahan</td>
-                  <td style={{ padding: 8 }}>
-                    {
-                      ["Milik sendiri", "Sewa", "Bagi hasil"][
-                        formData.status_lahan - 1
-                      ]
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>
-                    Pendapatan Musim
-                  </td>
-                  <td style={{ padding: 8 }}>
-                    {
-                      ["> 5 juta", "2 - 5 juta", "< 2 juta"][
-                        formData.pendapatan - 1
-                      ]
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ fontWeight: 700, padding: 8 }}>
-                    Rekomendasi Penyuluh
-                  </td>
-                  <td style={{ padding: 8 }}>
-                    {
-                      ["Tidak direkomendasikan", "Direkomendasikan"][
-                        formData.rekomendasi - 1
-                      ]
-                    }
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <button
-              type="button"
-              onClick={handleExportPDF}
-              style={{
-                marginTop: 12,
-                width: "100%",
-                backgroundColor: "#2563eb",
-                color: "#fff",
-                fontWeight: 700,
-                padding: "10px 0",
-                border: "none",
-                borderRadius: 8,
-                fontSize: 16,
-                cursor: "pointer",
-              }}
-            >
-              Unduh PDF
-            </button>
+
+            <p className="text-xs text-gray-500">
+              Catatan: CF Hasil = CF User (maks untuk OR) × CF Pakar.
+            </p>
           </div>
         )}
       </div>

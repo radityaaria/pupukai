@@ -17,24 +17,39 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabase.from("users").insert([
-        {
-          nama: nama,
-          umur: umur,
-          pekerjaan: pekerjaan,
-          alamat: alamat,
-          email: email,
-          password: password, // In a real application, you should hash the password before sending it to the database
-          role: role,
-        },
-      ]);
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+      });
 
-      if (error) {
-        throw error;
+      if (authError) {
+        console.error("Supabase Auth Error:", authError);
+        throw authError;
       }
 
-      alert("Pendaftaran berhasil!");
-      router.push("/pelanggaran"); // Redirect to home page after successful registration
+      const user = authData.user;
+
+      if (user && authData.session) {
+        localStorage.setItem("token", authData.session.access_token);
+
+        const { data, error } = await supabase.from("users").insert([
+          {
+            id_user: user.id,
+            nama: nama,
+            umur: umur,
+            pekerjaan: pekerjaan,
+            alamat: alamat,
+            email: email,
+            role: role,
+          },
+        ]);
+
+        if (error) {
+          throw error;
+        }
+        alert("Pendaftaran berhasil!");
+        router.push("/pelanggaran");
+      }
     } catch (error) {
       alert("Terjadi kesalahan saat pendaftaran: " + error.message);
     }
