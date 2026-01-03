@@ -189,6 +189,8 @@ const jawabanLabelMap = opsiJawaban.reduce((acc, opsi) => {
 export default function PrediksiPupuk() {
   const [formData, setFormData] = useState({
     nama_pelanggar: "",
+    umur: "",
+    pekerjaan: "",
     alamat: "",
     ...pertanyaanPelanggaran.reduce((acc, q) => {
       acc[q.id] = "";
@@ -211,10 +213,41 @@ export default function PrediksiPupuk() {
   const [totalDendaMaks, setTotalDendaMaks] = useState(0); // opsional total denda
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    }
+    const fetchUserData = async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError) {
+        console.error("Error fetching user:", userError);
+        router.push("/login");
+        return;
+      }
+
+      if (user) {
+        const { data, error } = await supabase
+          .from("users")
+          .select("nama, umur, pekerjaan, alamat")
+          .eq("id_user", user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching user data:", error);
+        } else if (data) {
+          setFormData((prev) => ({
+            ...prev,
+            nama_pelanggar: data.nama,
+            umur: data.umur,
+            pekerjaan: data.pekerjaan,
+            alamat: data.alamat,
+          }));
+        }
+      } else {
+        router.push("/login");
+      }
+    };
+
+    fetchUserData();
   }, [router]);
 
   const handleChange = (e) => {
@@ -303,6 +336,16 @@ export default function PrediksiPupuk() {
     setShowQuestionnaire(false);
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error);
+    } else {
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-slate-200 p-4 py-8">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-4xl mx-auto">
@@ -312,8 +355,8 @@ export default function PrediksiPupuk() {
         <p className="text-lg text-gray-700 mb-8 text-center leading-relaxed">
           {showQuestionnaire && (
             <>
-              Silakan jawab pertanyaan berikut dengan memilih{" "}
-              <strong>Ya</strong> atau <strong>Tidak</strong>
+              Silakan jawab pertanyaan berikut seusai dengan kejadian yang
+              terjadi.
             </>
           )}
         </p>
@@ -334,9 +377,45 @@ export default function PrediksiPupuk() {
                   name="nama_pelanggar"
                   id="nama_pelanggar"
                   value={formData.nama_pelanggar}
-                  onChange={handleChange}
+                  readOnly
                   className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
                   placeholder="Nama lengkap"
+                  required
+                />
+              </div>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="umur"
+                  className="text-sm font-semibold text-gray-700 mb-1"
+                >
+                  Umur
+                </label>
+                <input
+                  type="number"
+                  name="umur"
+                  id="umur"
+                  value={formData.umur}
+                  readOnly
+                  className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                  placeholder="Umur"
+                  required
+                />
+              </div>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="pekerjaan"
+                  className="text-sm font-semibold text-gray-700 mb-1"
+                >
+                  Pekerjaan
+                </label>
+                <input
+                  type="text"
+                  name="pekerjaan"
+                  id="pekerjaan"
+                  value={formData.pekerjaan}
+                  readOnly
+                  className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                  placeholder="Pekerjaan"
                   required
                 />
               </div>
@@ -352,7 +431,7 @@ export default function PrediksiPupuk() {
                   name="alamat"
                   id="alamat"
                   value={formData.alamat}
-                  onChange={handleChange}
+                  readOnly
                   className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
                   placeholder="Alamat lengkap"
                   required
@@ -408,7 +487,7 @@ export default function PrediksiPupuk() {
         )}
 
         {/* Output Section */}
-        {!showQuestionnaire && ringkasanJawaban && (
+        {/* {!showQuestionnaire && ringkasanJawaban && (
           <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-6 space-y-4">
             <div>
               <h3 className="text-xl font-semibold text-gray-800">
@@ -441,12 +520,12 @@ export default function PrediksiPupuk() {
               ))}
             </div>
           </div>
-        )}
+        )} */}
 
         {hasilPelanggaran.length > 0 && (
           <div className="mt-8 bg-white border border-gray-200 rounded-xl p-6 space-y-4">
             <h3 className="text-xl font-semibold text-gray-800">
-              Hasil Analisis (CF & Denda Maksimal)
+              Hasil Indentifikasi & Pelanggaran Denda
             </h3>
 
             <div className="text-gray-700">
@@ -471,9 +550,6 @@ export default function PrediksiPupuk() {
                     <th className="p-2 border">No</th>
                     <th className="p-2 border">Rule</th>
                     <th className="p-2 border">Pasal</th>
-                    <th className="p-2 border">CF User</th>
-                    <th className="p-2 border">CF Pakar</th>
-                    <th className="p-2 border">CF Hasil</th>
                     <th className="p-2 border">Denda Maks</th>
                   </tr>
                 </thead>
@@ -488,11 +564,6 @@ export default function PrediksiPupuk() {
                           {h.keterangan}
                         </div>
                       </td>
-                      <td className="p-2 border text-center">{h.cf_user}</td>
-                      <td className="p-2 border text-center">{h.cf_pakar}</td>
-                      <td className="p-2 border text-center font-semibold text-blue-700">
-                        {h.cf_hasil}
-                      </td>
                       <td className="p-2 border text-center font-semibold">
                         {formatRupiah(h.denda_maks)}
                       </td>
@@ -501,10 +572,12 @@ export default function PrediksiPupuk() {
                 </tbody>
               </table>
             </div>
-
-            <p className="text-xs text-gray-500">
-              Catatan: CF Hasil = CF User (maks untuk OR) × CF Pakar.
-            </p>
+            <button
+              onClick={handleLogout}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg mt-6 transition-colors"
+            >
+              Selesai
+            </button>
           </div>
         )}
       </div>

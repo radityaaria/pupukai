@@ -54,16 +54,13 @@ const Navbar = () => {
             Petunjuk Penggunaan
           </a>
         </li>
-        <li>
-          <a href="/pelanggaran" className="hover:text-gray-400">
-            Identifikasi Pelanggaran
-          </a>
-        </li>
-        {/* <li>
-          <a href="/dokumentasi" className="hover:text-gray-400">
-            Dokumentasi & Wawancara
-          </a>
-        </li> */}
+        {isLoggedIn && (
+          <li>
+            <a href="/pelanggaran" className="hover:text-gray-400">
+              Identifikasi Pelanggaran
+            </a>
+          </li>
+        )}
       </ul>
       {!isLoggedIn && (
         <a

@@ -1,6 +1,6 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
+import ImageCarousel from "../../components/ImageCarousel";
 
 // Hanya satu pemanggilan dynamic untuk MapComponent
 const MapComponent = dynamic(() => import("../../components/Map"), {
@@ -16,16 +16,27 @@ const About = () => {
             Selamat Datang di Tilang Expert
           </h1>
           <p>
-            Website ini merupakan platform sistem pakar berbasis web yang dirancang untuk membantu proses penentuan jenis pelanggaran lalu lintas serta besaran denda secara objektif dan konsisten.
-            Sistem ini dikembangkan menggunakan metode Certainty Factor (CF), yaitu pendekatan kecerdasan buatan yang menggunakan faktor kepastian untuk menghitung tingkat keyakinan terhadap suatu kesimpulan berdasarkan aturan-aturan yang telah ditetapkan.
+            Website ini merupakan platform sistem pakar berbasis web yang
+            dirancang untuk membantu proses penentuan jenis pelanggaran lalu
+            lintas serta besaran denda secara objektif dan konsisten. Sistem ini
+            dikembangkan menggunakan metode Certainty Factor (CF), yaitu
+            pendekatan kecerdasan buatan yang menggunakan faktor kepastian untuk
+            menghitung tingkat keyakinan terhadap suatu kesimpulan berdasarkan
+            aturan-aturan yang telah ditetapkan.
           </p>
           <p>
-            Dengan penerapan metode CF, TilangExpert dapat menghitung tingkat kepastian dari setiap indikator pelanggaran, menggabungkan nilai certainty factor dari berbagai gejala yang teridentifikasi, menampilkan rekomendasi klasifikasi dan denda sesuai Undang-Undang Lalu Lintas Kepolisian Republik Indonesia, serta memberikan transparansi dalam proses penegakan hukum.
+            Dengan penerapan metode CF, TilangExpert dapat menghitung tingkat
+            kepastian dari setiap indikator pelanggaran, menggabungkan nilai
+            certainty factor dari berbagai gejala yang teridentifikasi,
+            menampilkan rekomendasi klasifikasi dan denda sesuai Undang-Undang
+            Lalu Lintas Kepolisian Republik Indonesia, serta memberikan
+            transparansi dalam proses penegakan hukum.
           </p>
           <p>
-            Website ini merupakan bagian dari proyek pengembangan berbasis riset dan tugas akhir dalam bidang Sistem Pakar.
-
-            Jelajahi fitur kami dan lihat bagaimana TilangExpert berperan dalam mendukung digitalisasi penegakan hukum yang lebih adil, efisien, dan terstandar.
+            Website ini merupakan bagian dari proyek pengembangan berbasis riset
+            dan tugas akhir dalam bidang Sistem Pakar. Jelajahi fitur kami dan
+            lihat bagaimana TilangExpert berperan dalam mendukung digitalisasi
+            penegakan hukum yang lebih adil, efisien, dan terstandar.
           </p>
         </div>
         <div className="flex-1">
@@ -45,20 +56,34 @@ const About = () => {
           metode K-Nearest Neighbor (KNN) sebagai inti dari penentuan kriteria.
         </p> */}
         <p className="text-xl">
-          Penelitian ini berfokus pada pengembangan sistem pakar berbasis CF (Certainty Factor) untuk membantu petugas dalam menentukan tingkat pelanggaran dan besaran denda secara cepat dan sesuai hukum.
-          Tujuan utamanya adalah menciptakan sistem yang dapat meningkatkan konsistensi keputusan, akurasi penilaian, dan transparansi proses tilang di lapangan.
+          Penelitian ini berfokus pada pengembangan sistem pakar berbasis CF
+          (Certainty Factor) untuk membantu petugas dalam menentukan tingkat
+          pelanggaran dan besaran denda secara cepat dan sesuai hukum. Tujuan
+          utamanya adalah menciptakan sistem yang dapat meningkatkan konsistensi
+          keputusan, akurasi penilaian, dan transparansi proses tilang di
+          lapangan.
         </p>
         <p className="text-xl mt-4">
-          Selain itu, penelitian ini juga mengkaji bagaimana penerapan Certainty Factor dapat membantu aparat kepolisian dalam:
+          Selain itu, penelitian ini juga mengkaji bagaimana penerapan Certainty
+          Factor dapat membantu aparat kepolisian dalam:
         </p>
         <ul className="text-xl list-disc list-inside ml-4 space-y-2">
-          <li>Mengidentifikasi jenis pelanggaran berdasarkan ciri-ciri kejadian,</li>
+          <li>
+            Mengidentifikasi jenis pelanggaran berdasarkan ciri-ciri kejadian,
+          </li>
           <li>Menentukan besaran denda sesuai pasal hukum,</li>
-          <li>Menyimpan dan memperbarui basis data kasus baru secara otomatis setelah diverifikasi.</li>
+          <li>
+            Menyimpan dan memperbarui basis data kasus baru secara otomatis
+            setelah diverifikasi.
+          </li>
         </ul>
         <p className="text-xl mt-4">
-          Objek penelitian difokuskan pada kasus pelanggaran lalu lintas umum di wilayah Yogyakarta dan sekitarnya, dengan studi awal melibatkan POLRES Bantul sebagai acuan data hukum dan klasifikasi pelanggaran yang berlaku.
+          Objek penelitian difokuskan pada kasus pelanggaran lalu lintas umum di
+          wilayah Yogyakarta dan sekitarnya, dengan studi awal melibatkan POLRES
+          Bantul sebagai acuan data hukum dan klasifikasi pelanggaran yang
+          berlaku.
         </p>
+        <ImageCarousel />
         <p className="mt-4 text-xl">
           Jika Anda memiliki pertanyaan, silakan hubungi kami melalui informasi
           di bawah ini:

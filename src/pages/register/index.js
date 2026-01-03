@@ -127,14 +127,18 @@ const Register = () => {
               <label htmlFor="pekerjaan" className="block mb-1">
                 Pekerjaan
               </label>
-              <input
-                type="text"
+              <select
                 id="pekerjaan"
                 value={pekerjaan}
                 onChange={(e) => setPekerjaan(e.target.value)}
                 required
                 className="w-full p-2 border border-gray-300 rounded bg-white"
-              />
+              >
+                <option value="">Pilih Pekerjaan</option>
+                <option value="pelajar">Pelajar</option>
+                <option value="mahasiswa">Mahasiswa</option>
+                <option value="masyarakat umum">Masyarakat Umum</option>
+              </select>
             </div>
           </div>
           <div>
